@@ -1,13 +1,17 @@
 import React from "react";
-import { Provider } from "react-redux";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import {Provider} from "react-redux";
+import {BrowserRouter as Router, Route } from "react-router-dom";
 
-const Root = ({ store }) => {
-    <Provider store={store} >
+import {Home} from "../../components/home";
+import {Edit} from "../../components/edit";
+
+export const Root = ({store}) => (
+    <Provider store={store}>
         <Router>
-            <Route path="/" />
+            <div>
+                <Route exact path="/" component={Home}/>
+                <Route exact path="/:state" component={Edit}/>
+            </div>
         </Router>
     </Provider>
-};
-
-export default Root;
+);

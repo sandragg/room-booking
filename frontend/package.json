@@ -5,30 +5,50 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack-dev-server"
+    "dev": "webpack-dev-server",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "author": "Sandra",
   "license": "MIT",
   "dependencies": {
+    "moment": "2.20.1",
+    "react-dates": "16.0.1",
+    "react-tooltip": "3.4.0",
+    "copy-webpack-plugin": "4.3.1",
     "react": "16.0.0",
+    "react-autocomplete": "1.7.2",
     "react-dom": "16.0.0",
     "react-redux": "5.0.6",
+    "react-router-dom": "4.2.2",
     "redux": "3.7.2",
+    "redux-actions": "2.2.1",
+    "redux-thunk": "2.2.0",
+    "redux-thunk-actions": "1.1.6",
     "styled-components": "2.4.0"
   },
   "devDependencies": {
+    "@storybook/addon-actions": "3.3.3",
+    "@storybook/addon-links": "3.3.3",
+    "@storybook/react": "3.3.3",
     "babel-core": "6.26.0",
     "babel-loader": "7.1.2",
+    "babel-plugin-inline-react-svg": "0.5.2",
+    "babel-plugin-transform-replace-object-assign": "^0.2.1",
+    "babel-preset-airbnb": "^2.4.0",
     "babel-preset-env": "1.6.0",
     "babel-preset-react": "6.24.1",
+    "babel-preset-stage-0": "6.24.1",
     "babel-preset-stage-2": "6.24.1",
     "css-loader": "0.28.7",
-    "style-loader": "0.19.0",
     "file-loader": "1.1.5",
     "html-webpack-plugin": "2.30.1",
     "redux-devtools": "3.4.0",
     "redux-logger": "3.0.6",
+    "style-loader": "0.19.0",
+    "svg-url-loader": "2.3.1",
     "webpack": "3.6.0",
-    "webpack-dev-server": "2.9.3"
+    "webpack-dev-server": "2.9.3",
+    "whatwg-fetch": "2.0.3"
   }
 }

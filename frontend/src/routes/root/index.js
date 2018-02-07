@@ -1,1 +1,1 @@
-export { default } from "./root";
+export {Root} from "./root";
