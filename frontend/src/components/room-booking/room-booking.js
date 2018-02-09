@@ -1,5 +1,7 @@
 import React from "react";
-import {Row, Column} from "../common-style";
+import moment from "moment";
+
+import {Column} from "../common-style";
 import {
     RoomBookingDiagramWrapperStyled,
     RoomBookingTimeLineWrapperStyled,
@@ -8,8 +10,6 @@ import {
 import BookingDate from "../booking-date";
 import TimeLine from "../time-line";
 import RoomList from "../room-list";
-import "moment/min/locales.min";
-import moment from "moment";
 import {ONE_MINUTE_WIDTH, ONE_HOUR_WIDTH, startHour, endHour} from "../constants";
 
 export class RoomBooking extends React.Component {
@@ -18,142 +18,25 @@ export class RoomBooking extends React.Component {
 
         moment.locale("ru");
 
-        const hoursLength = endHour - startHour + 1;
-
-        this.hours = Array.apply(null, {length: hoursLength}).map((e, i) => i + startHour);
-
-        this.events = [
-            {
-                "id": 1,
-                "title": "ШРИ 2018 - начало",
-                "dateStart": "2017-12-29 14:21:04.669 +00:00",
-                "dateEnd": "2017-12-29 15:48:04.669 +00:00",
-                "createdAt": "2017-12-29 14:21:04.669 +00:00",
-                "updatedAt": "2017-12-29 14:21:04.713 +00:00",
-                "room": {
-                    "id": 1,
-                    "title": "404",
-                    "capacity": 5,
-                    "floor": 4,
-                    "createdAt": "2017-12-29 14:21:04.668 +00:00",
-                    "updatedAt": "2017-12-29 14:21:04.668 +00:00"
-                },
-                "users": [
-                    {
-                        "id": 1,
-                        "login": "veged",
-                        "homeFloor": "0 этаж",
-                        "avatarUrl": "https://avatars3.githubusercontent.com/u/15365?s=460&v=4",
-                        "createdAt": "2017-12-29 14:21:04.666 +00:00",
-                        "updatedAt": "2017-12-29 14:21:04.666 +00:00"
-                    },
-                    {
-                        "id": 2,
-                        "login": "alt-j",
-                        "homeFloor": "3 этаж",
-                        "avatarUrl": "https://avatars1.githubusercontent.com/u/3763844?s=400&v=4",
-                        "createdAt": "2017-12-29 14:21:04.666 +00:00",
-                        "updatedAt": "2017-12-29 14:21:04.666 +00:00"
-                    },
-                ]
-            },
-            {
-                "id": 2,
-                "title": "\uD83D\uDC7E Хакатон \uD83D\uDC7E",
-                "dateStart": "2017-12-29 15:21:04.669 +00:00",
-                "dateEnd": "2017-12-29 16:21:04.669 +00:00",
-                "createdAt": "2017-12-29 14:21:04.669 +00:00",
-                "updatedAt": "2017-12-29 14:21:04.715 +00:00",
-                "room": {
-                    "id": 2,
-                    "title": "Деньги",
-                    "capacity": 4,
-                    "floor": 2,
-                    "createdAt": "2017-12-29 14:21:04.668 +00:00",
-                    "updatedAt": "2017-12-29 14:21:04.668 +00:00"
-                },
-                "users": [
-                    {
-                        "id": 2,
-                        "login": "alt-j",
-                        "homeFloor": "3 этаж",
-                        "avatarUrl": "https://avatars1.githubusercontent.com/u/3763844?s=400&v=4",
-                        "createdAt": "2017-12-29 14:21:04.666 +00:00",
-                        "updatedAt": "2017-12-29 14:21:04.666 +00:00"
-                    },
-                    {
-                        "id": 3,
-                        "login": "yeti-or",
-                        "homeFloor": "2 этаж",
-                        "avatarUrl": "https://avatars0.githubusercontent.com/u/1813468?s=460&v=4",
-                        "createdAt": "2017-12-29 14:21:04.666 +00:00",
-                        "updatedAt": "2017-12-29 14:21:04.666 +00:00"
-                    }
-                ]
-            },
-            {
-                "id": 3,
-                "title": "\uD83C\uDF68 Пробуем kefir.js",
-                "dateStart": "2017-12-29 16:21:04.669 +00:00",
-                "dateEnd": "2017-12-29 17:21:04.669 +00:00",
-                "createdAt": "2017-12-29 14:21:04.669 +00:00",
-                "updatedAt": "2017-12-29 14:21:04.716 +00:00",
-                "room": {
-                    "id": 3,
-                    "title": "Карты",
-                    "capacity": 4,
-                    "floor": 2,
-                    "createdAt": "2017-12-29 14:21:04.668 +00:00",
-                    "updatedAt": "2017-12-29 14:21:04.668 +00:00"
-                },
-                "users": [
-                    {
-                        "id": 1,
-                        "login": "veged",
-                        "homeFloor": "0 этаж",
-                        "avatarUrl": "https://avatars3.githubusercontent.com/u/15365?s=460&v=4",
-                        "createdAt": "2017-12-29 14:21:04.666 +00:00",
-                        "updatedAt": "2017-12-29 14:21:04.666 +00:00"
-                    },
-                    {
-                        "id": 3,
-                        "login": "yeti-or",
-                        "homeFloor": "2 этаж",
-                        "avatarUrl": "https://avatars0.githubusercontent.com/u/1813468?s=460&v=4",
-                        "createdAt": "2017-12-29 14:21:04.666 +00:00",
-                        "updatedAt": "2017-12-29 14:21:04.666 +00:00"
-                    }
-                ]
-            }
-        ];
+        this.hoursLength = endHour - startHour + 1;
+        this.eightHours = 60 * 8;
+        this.hours = Array.apply(null, {length: this.hoursLength}).map((e, i) => i + startHour);
 
         this.state = {
             rooms: {},
-            users: []
+            events: [],
+            isCalendarOpened: false,
+            day: moment(this.props.date).format("DD MMMM YYYY"),
+            time: moment().format("LT")
         };
 
-        this.state.events = this.events.map(event => {
-            const eightHours = 480;
-            const start = moment(event.dateStart);
-            const end = moment(event.dateEnd);
-            const duration = moment.duration(end.diff(start)).asMinutes();
-            const offset = start.hours() * 60 + start.minutes();
+        this.interval = setInterval(this.tick, 60000);
 
-            event.width = Math.abs(duration * ONE_MINUTE_WIDTH);
-            event.offset = Math.abs((offset - eightHours) * ONE_MINUTE_WIDTH);
-
-            return event;
-        });
-
-        this.state.isCalendarOpened = false;
-        this.state.day = moment(this.props.date).format("DD MMMM YYYY");
-        this.state.time = moment().format("LT");
-
+        this.mapEventsToState = this.mapEventsToState.bind(this);
+        this.mapRoomsToState = this.mapRoomsToState.bind(this);
         this.calculateTickerOffset = this.calculateTickerOffset.bind(this);
         this.tick = this.tick.bind(this);
         this.toggleCalendar = this.toggleCalendar.bind(this);
-
-        this.interval = setInterval(this.tick, 30000);
     }
 
     componentWillUnmount() {
@@ -162,20 +45,38 @@ export class RoomBooking extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         this.setState({
-            rooms:
-                nextProps.rooms.reduce((acc, item) => {
-                    if (acc[item.floor]) {
-                        acc[item.floor].push(item);
-                    }
-                    else {
-                        acc[item.floor] = [item];
-                    }
-
-                    return acc;
-                }, {}),
-            users: [...nextProps.users],
+            rooms: nextProps.rooms ? this.mapRoomsToState(nextProps.rooms) : {},
+            events: nextProps.events ? this.mapEventsToState(nextProps.events) : [],
             day: moment(nextProps.date).format("DD MMMM YYYY")
         });
+    }
+
+    mapEventsToState(events) {
+        return events.map(event => {
+            let copyEvent = {...event};
+            const start = moment(copyEvent.dateStart);
+            const end = moment(copyEvent.dateEnd);
+            const duration = moment.duration(end.diff(start)).asMinutes();
+            const offset = start.hours() * 60 + start.minutes();
+
+            copyEvent.width = Math.abs(duration * ONE_MINUTE_WIDTH);
+            copyEvent.offset = Math.abs((offset - this.eightHours) * ONE_MINUTE_WIDTH);
+
+            return copyEvent;
+        });
+    }
+
+    mapRoomsToState(rooms) {
+        return rooms.reduce((roomList, room) => {
+            if (roomList[room.floor]) {
+                roomList[room.floor].push(room);
+            }
+            else {
+                roomList[room.floor] = [room];
+            }
+
+            return roomList;
+        }, {});
     }
 
     calculateTickerOffset() {
@@ -198,8 +99,9 @@ export class RoomBooking extends React.Component {
     render() {
         const {day, time, rooms, events, isCalendarOpened} = this.state;
         const offset = this.calculateTickerOffset();
-        console.log(">>>",time);
-        console.log(day);
+        console.log(">>>",this.state);
+        console.log(">>>",this.props);
+
         return (
             <Column>
                 <RoomBookingTimeLineWrapperStyled>

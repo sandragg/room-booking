@@ -5,5 +5,8 @@ export {
     getUsers,
     getRooms,
     getEvents,
-    getEventById
+    getEventById,
+    getUserList,
+    getRoomList,
+    getEventList
 } from "./actions";

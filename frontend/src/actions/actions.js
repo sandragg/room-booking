@@ -1,6 +1,8 @@
 import {createActions} from "redux-actions";
 import {createActionsThunk} from "../redux-thunk-actions/redux-thunk-actions";
 import "whatwg-fetch";
+import {graphql} from 'react-apollo';
+import gql from "graphql-tag";
 
 const actionCreators = createActions({
     EDIT_EVENT: (value) => value,
@@ -29,3 +31,26 @@ const actionThunkCreators = createActionsThunk({
 });
 
 export const {getUsers, getRooms, getEvents, getEventById} = actionThunkCreators;
+
+export const getUserList = graphql(
+    gql`query {users {id, login, avatarUrl, homeFloor}}`,
+    {
+        props: ({data: {users}}) => ({userList: users})
+    }
+);
+
+export const getRoomList = graphql(
+    gql`query {rooms {id, title, capacity, floor}}`,
+    {
+        name: "room",
+        props: ({room: {rooms}}) => ({roomList: rooms})
+    }
+);
+
+export const getEventList = graphql(
+    gql`query {events {id, title, dateStart, dateEnd, room{id}, users{id, login, avatarUrl, homeFloor}}}`,
+    {
+        name: "event",
+        props: ({event: {events}}) => ({eventList: events})
+    }
+);

@@ -3,14 +3,14 @@ const Sequelize = require("sequelize");
 module.exports = (sequelize) => {
     const User = sequelize.define("User", {
         login: Sequelize.STRING,
-        homeFloor: Sequelize.TINYINT,
+        homeFloor: Sequelize.INTEGER(1),
         avatarUrl: Sequelize.STRING
     });
 
     const Room = sequelize.define("Room", {
         title: Sequelize.STRING,
-        capacity: Sequelize.SMALLINT,
-        floor: Sequelize.TINYINT
+        capacity: Sequelize.INTEGER(2),
+        floor: Sequelize.INTEGER(1)
     });
 
     const Event = sequelize.define("Event", {

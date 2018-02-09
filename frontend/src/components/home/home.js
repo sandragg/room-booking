@@ -1,9 +1,10 @@
 import React from "react";
 import {Link} from "react-router-dom";
 import {connect} from "react-redux";
-import * as actionCreators from "../../actions";
 import moment from "moment";
+import {compose} from 'react-apollo';
 
+import * as actionCreators from "../../actions";
 import {Column} from "../common-style";
 import {Button} from "../button";
 import {Header} from "../header";
@@ -19,14 +20,8 @@ class HomePage extends React.Component {
         }
     }
 
-    componentDidMount() {
-        this.props.getUsers()
-            .then(() => this.setState({users: this.props.users}));
-        this.props.getRooms()
-            .then(() => this.setState({rooms: this.props.rooms}));
-    }
-
     render() {
+        console.log("homepage roomList>>>", this.props, this.state);
         return (
             <Column>
                 <Header>
@@ -35,31 +30,31 @@ class HomePage extends React.Component {
                     </Link>
                 </Header>
                 <RoomBooking
-                    users={this.state.users}
-                    rooms={this.state.rooms}
+                    rooms={this.props.roomList}
+                    events={this.props.eventList}
                     date={this.props.date}
                     onDateChange={this.props.onDateChange}
-                    //onCreateButtonClick={this.props.onCreateButtonClick}
                 />
             </Column>
         )
     }
 }
 
+const HomePageWithData = compose(
+    actionCreators.getRoomList,
+    actionCreators.getEventList
+)(HomePage);
+
 const mapStateToProps = (store) => ({
-    users: store.users,
-    rooms: store.rooms,
     date: store.date
 });
 
 const mapDispatchToProps = (dispatch) => ({
     onCreateButtonClick: (props) => dispatch(actionCreators.editEvent(props)),
-    getUsers: () => dispatch(actionCreators.getUsers()),
-    getRooms: () => dispatch(actionCreators.getRooms()),
     onDateChange: (date) => dispatch(actionCreators.setDate(date))
 });
 
 export const Home = connect(
     mapStateToProps,
     mapDispatchToProps
-)(HomePage);
+)(HomePageWithData);
