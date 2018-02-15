@@ -12,7 +12,7 @@ export const ChipList = ({avatarKey, titleKey, items, onChipIconClick}) => {
             {item[titleKey]}
         </Chip>
     );
-    console.log("items", items);
+
     return (
         <Row style={{flexWrap: "wrap"}}>{chipList}</Row>
     );

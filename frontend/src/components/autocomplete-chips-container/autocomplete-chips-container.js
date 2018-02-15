@@ -11,7 +11,6 @@ export class AutocompleteChipsContainer extends React.Component {
             selectedItems: []
         };
 
-        this.items = props.items;
         this.titleKey = props.titleKey;
         this.subtitleKey = props.subtitleKey;
         this.avatarKey = props.avatarKey;
@@ -23,47 +22,33 @@ export class AutocompleteChipsContainer extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log(nextProps);
-        if (nextProps.selectedItems) {
-            this.setState({
-                selectedItems: nextProps.selectedItems.map(itemId =>
-                    nextProps.items.find(item => item.id === itemId)
-                )
-            });
-        }
+        this.setState({
+            selectedItems: nextProps.selectedItems.map(itemId =>
+                nextProps.items.find(item => item.id === itemId)
+            )
+        });
     }
 
-    addItem(item) {
-        this.setState(
-            prevState => {
-                const id = item.id;
-                const index = prevState.selectedItems.findIndex(item => item.id === id);
+    addItem(itemId) {
+        const index = this.state.selectedItems.findIndex(item => item.id === itemId);
 
-                if (!~index) return {selectedItems: [...prevState.selectedItems, item]};
-
-                return prevState;
-            },
-            () => this.props.onPropChange(
-                this.state.selectedItems.map(item => item.id),
-                "membersIds"
-            )
-        );
+        if (!~index)
+            this.props.onPropChange(
+                [...this.state.selectedItems.map(item => item.id), itemId]
+            );
     }
 
     removeItem(itemId) {
-        this.setState(
-            prevState => ({
-                selectedItems: prevState.selectedItems.filter(item => item.id !== itemId)
-            }),
-            () => this.props.onPropChange(
-                this.state.selectedItems.map(item => item.id),
-                "membersIds"
-            )
+        this.props.onPropChange(
+            this.state.selectedItems.reduce((selected, item) =>
+                item.id !== itemId
+                    ? [...selected, item.id]
+                    : selected
+            , [])
         );
     }
 
     render() {
-        console.log(this.state.selectedItems);
         return (
             <Column>
                 <Autocomplete

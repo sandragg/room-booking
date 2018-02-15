@@ -27,9 +27,9 @@ export default ({event, id, onIconClick}) => {
             <EventTooltipContentStyled>
                 <EventContentWrapperStyled>
                     <EventTitleStyled>{title}</EventTitleStyled>
-                    <Link to="edit">
+                    <Link to={"edit/" + event.id}>
                         <EventIcon>
-                            <Icon background type="edit" onClick={onIconClick}/>
+                            <Icon background type="edit"/>
                         </EventIcon>
                     </Link>
                     <EventContentStyled>{content}</EventContentStyled>

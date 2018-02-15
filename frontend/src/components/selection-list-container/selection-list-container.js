@@ -1,4 +1,6 @@
 import React from "react";
+import moment from "moment";
+
 import {
     SelectionListWrapper,
     SelectionListLabel,
@@ -11,55 +13,43 @@ export class SelectionListContainer extends React.Component {
         super(props);
 
         this.state = {
-            selectedItem: {}
+            selectedItem: null
         };
 
-        this.isEmpty = ::this.isEmpty;
         this.selectItem = ::this.selectItem;
         this.removeItem = ::this.removeItem;
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.selectedItem) {
-            this.setState({
-                selectedItem: nextProps.items.find(item =>
-                    item.id === nextProps.selectedItem
-                )
-            });
-        }
-    }
-
-    isEmpty(obj) {
-        for (let key in obj) return false;
-
-        return true;
+        this.setState({
+            selectedItem:
+                nextProps.selectedItem
+                    ? nextProps.items.find(item => item.id === nextProps.selectedItem)
+                    : null
+        });
     }
 
     selectItem(item) {
-        this.setState(
-            {selectedItem: item},
-            () => this.props.onPropChange(this.state.selectedItem.id, "roomId")
-        );
+        this.props.onPropChange(item.id)
     }
 
     removeItem() {
-        this.setState(
-            {selectedItem: {}},
-            () => this.props.onPropChange(null, "roomId")
-        );
+
+        this.props.onPropChange(null)
     }
 
     render() {
         let label, listItems, item;
+        const {event} = this.props;
 
-        if (!this.isEmpty(this.state.selectedItem)) {
+        if (this.state.selectedItem) {
             item = this.state.selectedItem;
             label = "Ваша переговорка";
             listItems =
                 <SelectionListItem
                     key={item.id}
                     type="primary"
-                    title={`12:00 — 13:00`}
+                    title={`${event.startTime} — ${event.endTime}`}
                     subtitle={`${item.title} · ${item.floor}`}
                     icon="close"
                     iconColor="#FFFFFF"
@@ -71,7 +61,7 @@ export class SelectionListContainer extends React.Component {
                 <SelectionListItem
                     key={item.id}
                     type="default"
-                    title={`12:00 — 13:00`}
+                    title={`${event.startTime} — ${event.endTime}`}
                     subtitle={`${item.title} · ${item.floor}`}
                     onItemClick={() => this.selectItem(item)}
                 />

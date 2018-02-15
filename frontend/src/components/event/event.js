@@ -6,7 +6,7 @@ import EventTooltip from "../event-tooltip";
 import {Column} from "../common-style";
 
 export default (props) => {
-    const {event, id, onTooltipIconClick} = props;
+    const {event, id} = props;
     const {width, offset, title, dateStart} = event;
     const eventTooltipId = `event-tooltip-${title}-${dateStart}`;
 
@@ -24,7 +24,7 @@ export default (props) => {
                 width={width}
                 offset={offset}
             />
-            <EventTooltip event={event} id={eventTooltipId} onIconClick={onTooltipIconClick}/>
+            <EventTooltip event={event} id={eventTooltipId}/>
         </Column>
     )
 };

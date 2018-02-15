@@ -30,13 +30,13 @@ export class RoomBooking extends React.Component {
             time: moment().format("LT")
         };
 
-        this.interval = setInterval(this.tick, 60000);
-
         this.mapEventsToState = this.mapEventsToState.bind(this);
         this.mapRoomsToState = this.mapRoomsToState.bind(this);
         this.calculateTickerOffset = this.calculateTickerOffset.bind(this);
         this.tick = this.tick.bind(this);
         this.toggleCalendar = this.toggleCalendar.bind(this);
+
+        this.interval = setInterval(this.tick, 60000);
     }
 
     componentWillUnmount() {
@@ -99,8 +99,6 @@ export class RoomBooking extends React.Component {
     render() {
         const {day, time, rooms, events, isCalendarOpened} = this.state;
         const offset = this.calculateTickerOffset();
-        console.log(">>>",this.state);
-        console.log(">>>",this.props);
 
         return (
             <Column>

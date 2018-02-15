@@ -18,12 +18,5 @@ router.use(graphqlHTTP({
     graphiql: true,
 }));
 
-const query = "query {events {id, title, dateStart, dateEnd, room{id}, users{id, login, avatarUrl, homeFloor}}}";
-graphql(schema, query).then((result) => {
-    console.log("json>>>>", JSON.stringify(result))
-});
-
-router.get("*", () => {console.log("router.get")});
-
 module.exports.router = router;
 module.exports.schema = schema;

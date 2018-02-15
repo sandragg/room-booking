@@ -1,7 +1,6 @@
 import React from "react";
 import {Link} from "react-router-dom";
 import {connect} from "react-redux";
-import moment from "moment";
 import {compose} from 'react-apollo';
 
 import * as actionCreators from "../../actions";
@@ -10,35 +9,21 @@ import {Button} from "../button";
 import {Header} from "../header";
 import {RoomBooking} from "../room-booking/room-booking";
 
-class HomePage extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            users: [],
-            rooms: []
-        }
-    }
-
-    render() {
-        console.log("homepage roomList>>>", this.props, this.state);
-        return (
-            <Column>
-                <Header>
-                    <Link to="create">
-                        <Button primary onClick={() => this.props.onCreateButtonClick()}>Создать встречу</Button>
-                    </Link>
-                </Header>
-                <RoomBooking
-                    rooms={this.props.roomList}
-                    events={this.props.eventList}
-                    date={this.props.date}
-                    onDateChange={this.props.onDateChange}
-                />
-            </Column>
-        )
-    }
-}
+const HomePage = ({roomList, eventList, date, onCreateButtonClick, onDateChange}) => (
+    <Column>
+        <Header>
+            <Link to="create">
+                <Button primary>Создать встречу</Button>
+            </Link>
+        </Header>
+        <RoomBooking
+            rooms={roomList}
+            events={eventList}
+            date={date}
+            onDateChange={onDateChange}
+        />
+    </Column>
+);
 
 const HomePageWithData = compose(
     actionCreators.getRoomList,
@@ -50,7 +35,6 @@ const mapStateToProps = (store) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    onCreateButtonClick: (props) => dispatch(actionCreators.editEvent(props)),
     onDateChange: (date) => dispatch(actionCreators.setDate(date))
 });
 

@@ -1,5 +1,4 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
     entry: {
@@ -14,12 +13,7 @@ module.exports = {
     watch: true,
 
     plugins: [
-        new HtmlWebpackPlugin({template: "index.html"}),
-        new CopyWebpackPlugin([
-            {from: "./src/static/main_Users.json", to: "users.json"},
-            {from: "./src/static/main_Rooms.json", to: "rooms.json"},
-            {from: "./src/static/main_Events.json", to: "events.json"}
-        ])
+        new HtmlWebpackPlugin({template: "index.html"})
     ],
 
     module: {

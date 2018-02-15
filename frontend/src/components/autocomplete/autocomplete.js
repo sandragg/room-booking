@@ -99,7 +99,7 @@ export class Autocomplete extends React.Component {
     }
 
     onSelect(value, item) {
-        this.props.onItemSelect(item);
+        this.props.onItemSelect(item.id);
     }
 
     render() {

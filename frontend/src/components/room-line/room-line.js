@@ -2,10 +2,9 @@ import React from "react";
 import {connect} from "react-redux";
 import moment from "moment";
 import {Link} from "react-router-dom";
-import * as actionCreators from "../../actions";
 
 import {RoomLineWrapperStyled, RoomLineContentStyled} from "./room-line-styled";
-import {ONE_HOUR_WIDTH, ONE_MINUTE_WIDTH, startHour} from "../constants";
+import {ONE_MINUTE_WIDTH, startHour} from "../constants";
 import Event from "../event";
 import NewEvent from "../new-event";
 
@@ -25,7 +24,6 @@ class RoomLine extends React.Component {
         this.showNewEvent = this.showNewEvent.bind(this);
         this.hideNewEvent = this.hideNewEvent.bind(this);
         this.calcNewEventOffset = this.calcNewEventOffset.bind(this);
-        this.getDecimal = this.getDecimal.bind(this);
     };
 
     showNewEvent(e) {
@@ -34,7 +32,7 @@ class RoomLine extends React.Component {
                 || e.target.id === "new-event")
         ) {
             const bounds = e.target.getBoundingClientRect();
-            console.log(bounds);
+
             this.setState({
                 hover: true,
                 roomLineLeftOffset: bounds.left,
@@ -45,8 +43,6 @@ class RoomLine extends React.Component {
     }
 
     hideNewEvent(e) {
-        console.log("Tar", e.target);
-        console.log("relTar", e.relatedTarget);
         if (this.state.hover
             && e.relatedTarget
             && e.relatedTarget.id !== "room-line"
@@ -64,38 +60,30 @@ class RoomLine extends React.Component {
         }
     }
 
-    getDecimal(num) {
-        return num > 0 ? (num % 1) : (-num % 1);
-    }
-
     createNewEvent() {
         const minuteOffset = this.state.roomLineWidth * ONE_MINUTE_WIDTH / 100;
-        let eventMinutes = this.state.newEventOffset / minuteOffset - 15,
-            eventHours, start, end, eventProps = {};
+        let eventMinutes = this.state.newEventOffset / minuteOffset - 15, eventHours;
 
-        if (eventMinutes < 0) eventMinutes = 0;
-        eventHours = parseInt(eventMinutes / 60 + startHour);
-        eventMinutes = parseInt(eventMinutes % 60);
+        if (eventMinutes < 0) {
+            eventMinutes = 0;
+            eventHours = startHour;
+        } else {
+            eventHours = parseInt(eventMinutes / 60 + startHour);
+            eventMinutes = parseInt(eventMinutes % 60);
+        }
 
-        console.log(eventHours);
-        console.log(eventMinutes);
+        const start = moment(this.props.date).set({hour: eventHours, minute: eventMinutes});
+        const end = moment(start).add(30, "minutes");
 
-        start = moment(this.props.date).set({hour: eventHours, minute: eventMinutes});
-        end = moment(start).add(30, "minutes");
-
-        eventProps = {
+        return {
             roomId: this.props.roomId,
             date: start.format("DD MM YYYY"),
             startTime: start.format("LT"),
             endTime: end.format("LT")
         };
-
-        this.props.onCreateButtonClick(eventProps);
     }
 
     render() {
-        const {events} = this.props;
-
         return (
             <RoomLineWrapperStyled>
                 <RoomLineContentStyled
@@ -104,20 +92,21 @@ class RoomLine extends React.Component {
                     onMouseOver={this.showNewEvent}
                     onMouseOut={this.hideNewEvent}
                 >
-                    {events.map(event =>
+                    {this.props.events.map(event =>
                         <Event id="event"
-                               key={"event" + event.dateStart}
-                               event={event}
-                               onTooltipIconClick={() => this.props.onEditButtonClick(event.id)}
+                           key={"event" + event.dateStart}
+                           event={event}
                         />
                     )}
                     {this.state.hover
-                        ? <Link to="create">
-                            <NewEvent id="new-event"
-                                      offset={this.state.newEventOffset}
-                                      onClick={this.createNewEvent}
-                            />
-                        </Link>
+                        ? <Link to={{
+                                pathname: "create",
+                                state: {
+                                    event: this.createNewEvent()
+                                }
+                            }}>
+                                <NewEvent id="new-event" offset={this.state.newEventOffset}/>
+                            </Link>
                         : null
                     }
                 </RoomLineContentStyled>
@@ -130,14 +119,8 @@ const mapStateToProps = (store) => ({
     date: store.date
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    onCreateButtonClick: (props) => dispatch(actionCreators.editEvent(props)),
-    onEditButtonClick: (id) => dispatch(actionCreators.getEventById(id))
-});
-
 const RoomLineContainer = connect(
-    mapStateToProps,
-    mapDispatchToProps
+    mapStateToProps
 )(RoomLine);
 
 export default RoomLineContainer;

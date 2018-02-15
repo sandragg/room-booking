@@ -13,7 +13,7 @@ export const RoomLineWrapperStyled = styled(Row)`
  * 13px - ширина часа, 1px - ширина линии времени => (13-1) / 2
  */
 const hoursMarginHalf = (13 - 1) / 2;
-console.log("margiiin",hoursMarginHalf);
+
 export const RoomLineContentStyled = styled(Row)`
   position: relative;
   margin: 0 ${20 + hoursMarginHalf}px;
