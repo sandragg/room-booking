@@ -17,13 +17,14 @@ export const InputLabel = styled.div`
 `;
 
 export const InputWrapper = styled.input.attrs({
-    type: "text"
+    // type: "date"
 })`
+  type: ${props => props.type | "text"}
   outline: none;
   width: calc(100% - 24px);
   height: 11px;
   background: #FFFFFF;
-  border: 2px solid #E9ECEF;
+  border: 2px solid ${props => props.valid ? "#E9ECEF" : "#a83b3b"};
   border-radius: 4px;
   padding: 11px 10px 12px;
   line-height: 15px;
@@ -31,9 +32,13 @@ export const InputWrapper = styled.input.attrs({
   font-size: 15px;
   color: #000000;
   letter-spacing: 0.55px;
+  
+  
+  
   &:focus {
     border: 2px solid #007DFF;
   }
+  
   &::placeholder {
     font-family: HelveticaNeue-Light;
     font-size: 13px;
@@ -41,6 +46,22 @@ export const InputWrapper = styled.input.attrs({
     letter-spacing: 0.47px;
     font-weight: 100;
   }
+  
+  ${props => props.type === "date" && css`
+    ::-webkit-calendar-picker-indicator {
+      color: #AFB4B8;
+      opacity: 1;
+      //display: block;
+      //background:black;
+      //width: 20px;
+      //height: 20px;
+      border-width: thin;
+    }
+    ::-webkit-calendar-picker-indicator:hover {
+      color: #000;
+      background: white;
+    }
+  `};
 `;
 
 export const InputIcon = styled.div`

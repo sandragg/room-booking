@@ -9,7 +9,7 @@ import {Button} from "../button";
 import {Header} from "../header";
 import {RoomBooking} from "../room-booking/room-booking";
 
-const HomePage = ({roomList, eventList, date, onCreateButtonClick, onDateChange}) => (
+const HomePage = ({roomList, eventList, date, onDateChange}) => (
     <Column>
         <Header>
             <Link to="create">
@@ -27,7 +27,7 @@ const HomePage = ({roomList, eventList, date, onCreateButtonClick, onDateChange}
 
 const HomePageWithData = compose(
     actionCreators.getRoomList,
-    actionCreators.getEventList
+    actionCreators.getEventsByDate
 )(HomePage);
 
 const mapStateToProps = (store) => ({

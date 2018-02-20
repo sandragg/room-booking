@@ -8,4 +8,5 @@ export const IconWrapper = styled(Column)`
   border-radius: 50%;
   align-items: center;
   justify-content: space-around;
+  cursor: pointer;
 `;

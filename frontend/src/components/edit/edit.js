@@ -1,6 +1,5 @@
 import React from "react";
 import {Link} from "react-router-dom";
-import {connect} from "react-redux";
 import {compose} from 'react-apollo';
 import * as actionCreators from "../../actions";
 import moment from "moment";
@@ -22,6 +21,9 @@ import {Button} from "../button";
 import {Header} from "../header";
 import {Footer} from "../footer";
 import {Column, Row} from "../common-style";
+import {DialogBox} from "../dialog-box/dialog-box";
+import forbid from "../../assets/images/emoji1.svg";
+import success from "../../assets/images/emoji2.svg";
 
 class EditPage extends React.Component {
     constructor(props) {
@@ -36,28 +38,32 @@ class EditPage extends React.Component {
             date: "",
             startTime: "",
             endTime: "",
-            roomId: null
+            roomId: null,
+            isRemoved: false,
+            isCreated: false
         };
 
-        if (this.options){
+        if (this.options) {
             const {event} = this.options;
 
-            for(let key in event)
+            for (let key in event)
                 this.state[key] = event[key];
         }
 
         if (!this.id) {
             this.title = "Новая встреча";
-            this.footerContent = <Button primary>Создать встречу</Button>;
+            this.footerContent = <Button primary onClick={()=>this.setState({isCreated: true})}>Создать встречу</Button>;
         } else {
             this.title = "Редактирование встречи";
             this.footerContent = (
                 <Row>
-                    <Button default>Удалить встречу</Button>
+                    <Button default onClick={() => this.setState({isRemoved: true})}>Удалить встречу</Button>
                     <Button default>Сохранить</Button>
                 </Row>
             );
         }
+
+        this.isEventValid = ::this.isEventValid;
     }
 
     componentWillReceiveProps(nextProps) {
@@ -67,17 +73,21 @@ class EditPage extends React.Component {
             this.setState({
                 title: event.title,
                 membersIds: event.users.map(user => user.id),
-                date: moment(event.dateStart).format("DD MM YYYY"),
-                startTime: moment(event.dateStart).format("LT"),
-                endTime: moment(event.dateEnd).format("LT"),
+                date: moment(event.dateStart).format("YYYY-MM-DD"),
+                startTime: moment(event.dateStart).format("HH:mm"),
+                endTime: moment(event.dateEnd).format("HH:mm"),
                 roomId: event.room.id
             })
         }
     }
 
-    render() {
-        const {userList, roomList} = this.props;
+    isEventValid() {
 
+    }
+
+    render() {
+        const {userList, roomList, removeEvent} = this.props;
+        console.log(this.props);
         return (
             <Column>
                 <Header/>
@@ -95,6 +105,7 @@ class EditPage extends React.Component {
                                        placeholder="О чем будете говорить?"
                                        value={this.state.title}
                                        onChange={(e) => this.setState({title: e.target.value})}
+                                       valid={this.state.title.length > 0}
                                 />
                                 <AutocompleteChipsContainer
                                     titleKey="login"
@@ -109,25 +120,36 @@ class EditPage extends React.Component {
                             </EditColumn>
                             <EditColumn>
                                 <InputWrapper>
-                                    <InputWrapper basis="57">
-                                        <Input type="date"
-                                               label="Дата"
-                                               grow="3"
-                                               value={this.state.date}
-                                               onChange={(e) => this.setState({date: e.target.value})}/>
+                                    <InputWrapper basis="45">
+                                        <Input
+                                            type="date"
+                                            label="Дата"
+                                            grow="3"
+                                            value={this.state.date}
+                                            valid={moment(this.state.date, "YYYY-MM-DD", true).isValid()}
+                                            onChange={(e) => this.setState({date: e.target.value})}
+                                        />
                                     </InputWrapper>
-                                    <InputWrapper basis="17">
-                                        <Input label="Начало" grow="2"
-                                               value={this.state.startTime}
-                                               onChange={(e) => this.setState({startTime: e.target.value})}/>
+                                    <InputWrapper basis="23">
+                                        <Input
+                                            type="time"
+                                            label="Начало" grow="2"
+                                            value={this.state.startTime}
+                                            valid={moment(this.state.startTime, "HH:mm", true).isValid()}
+                                            onChange={(e) => this.setState({startTime: e.target.value})}
+                                        />
                                     </InputWrapper>
                                     <InputWrapper>
                                         <Divider>—</Divider>
                                     </InputWrapper>
-                                    <InputWrapper basis="17">
-                                        <Input label="Конец"
-                                               value={this.state.endTime}
-                                               onChange={(e) => this.setState({endTime: e.target.value})}/>
+                                    <InputWrapper basis="23">
+                                        <Input
+                                            type="time"
+                                            label="Конец"
+                                            value={this.state.endTime}
+                                            valid={moment(this.state.endTime, "HH:mm", true).isValid()}
+                                            onChange={(e) => this.setState({endTime: e.target.value})}
+                                        />
                                     </InputWrapper>
                                 </InputWrapper>
                                 <SelectionListContainer
@@ -146,22 +168,37 @@ class EditPage extends React.Component {
                     </Link>
                     {this.footerContent}
                 </Footer>
+                {
+                    this.state.isRemoved
+                        ? <DialogBox
+                            title="Вы действительно хотите удалить встречу?"
+                            subtitle={this.state.title}
+                            text={`${moment(this.state.date).format("DD MMMM YYYY")}, ${this.state.startTime}`}
+                            isDialog
+                            img={forbid}
+                            onClick={() => removeEvent(this.state.id)}
+                        />
+                        : null
+                }
+                {
+                    this.state.isCreated
+                        ? <DialogBox
+                            title="Встреча была успешно создана!"
+                            subtitle={this.state.title}
+                            text={`${moment(this.state.date).format("DD MMMM YYYY")}, ${this.state.startTime}`}
+                            img={success}
+                        />
+                        : null
+                }
             </Column>
         )
     }
 }
 
-const EditPageWithData = compose(
+export const Edit = compose(
+    actionCreators.createEvent,
+    actionCreators.removeEvent,
     actionCreators.getEventById,
     actionCreators.getRoomList,
     actionCreators.getUserList
 )(EditPage);
-
-const mapDispatchToProps = (dispatch) => ({
-    onPropChange: (prop, flag) => dispatch(actionCreators.editEventProp(prop, flag))
-});
-
-export const Edit = connect(
-    null,
-    mapDispatchToProps
-)(EditPageWithData);

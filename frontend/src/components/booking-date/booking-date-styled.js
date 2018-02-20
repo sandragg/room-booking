@@ -6,6 +6,7 @@ export const BookingDateWrapperStyled = styled.div`
   width: 245px;
   display: flex;
   align-items: center;
+  justify-content: center;
 `;
 
 export const BookingDateText = styled.span`
@@ -14,7 +15,7 @@ export const BookingDateText = styled.span`
   color: #000000;
   letter-spacing: 0;
   font-weight: bold;
-  margin-left: 24px;
+  margin: 0 16px;
   &:hover {
     font-family: HelveticaNeue-Bold;
     font-size: 15px;

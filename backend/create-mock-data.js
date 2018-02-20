@@ -48,7 +48,7 @@ function createData () {
   ]);
 
   const HOUR = 60 * 60 * 1000;
-  let now = new Date();
+  let now = new Date("2018-02-19");
   let oneHourLater = new Date(now.getTime() + HOUR);
   let twoHoursLater = new Date(oneHourLater.getTime() + HOUR);
   let threeHoursLater = new Date(twoHoursLater.getTime() + HOUR);
@@ -66,8 +66,8 @@ function createData () {
     },
     {
       title: '🍨 Пробуем kefir.js',
-      dateStart: threeHoursLater,
-      dateEnd: twoHoursLater
+      dateStart: twoHoursLater,
+      dateEnd: threeHoursLater
     }
   ]);
 

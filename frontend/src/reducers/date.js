@@ -5,6 +5,6 @@ moment.locale("ru");
 
 export const date = handleAction(
     "SET_DATE",
-    (state, action) => action.payload,
-    moment().format()
+    (state, action) => action.payload.format("DD MMMM YYYY"),
+    moment().format("DD MMMM YYYY")
 );

@@ -26,7 +26,6 @@ export class RoomBooking extends React.Component {
             rooms: {},
             events: [],
             isCalendarOpened: false,
-            day: moment(this.props.date).format("DD MMMM YYYY"),
             time: moment().format("LT")
         };
 
@@ -46,23 +45,22 @@ export class RoomBooking extends React.Component {
     componentWillReceiveProps(nextProps) {
         this.setState({
             rooms: nextProps.rooms ? this.mapRoomsToState(nextProps.rooms) : {},
-            events: nextProps.events ? this.mapEventsToState(nextProps.events) : [],
-            day: moment(nextProps.date).format("DD MMMM YYYY")
+            events: nextProps.events ? this.mapEventsToState(nextProps.events) : []
         });
     }
 
     mapEventsToState(events) {
         return events.map(event => {
-            let copyEvent = {...event};
-            const start = moment(copyEvent.dateStart);
-            const end = moment(copyEvent.dateEnd);
+            const start = moment(event.dateStart);
+            const end = moment(event.dateEnd);
             const duration = moment.duration(end.diff(start)).asMinutes();
             const offset = start.hours() * 60 + start.minutes();
 
-            copyEvent.width = Math.abs(duration * ONE_MINUTE_WIDTH);
-            copyEvent.offset = Math.abs((offset - this.eightHours) * ONE_MINUTE_WIDTH);
-
-            return copyEvent;
+            return {
+                ...event,
+                width: Math.abs(duration * ONE_MINUTE_WIDTH),
+                offset: Math.abs((offset - this.eightHours) * ONE_MINUTE_WIDTH)
+            };
         });
     }
 
@@ -97,14 +95,14 @@ export class RoomBooking extends React.Component {
     }
 
     render() {
-        const {day, time, rooms, events, isCalendarOpened} = this.state;
+        const {time, rooms, events, isCalendarOpened} = this.state;
         const offset = this.calculateTickerOffset();
 
         return (
             <Column>
                 <RoomBookingTimeLineWrapperStyled>
                     <BookingDate
-                        day={day}
+                        day={this.props.date}
                         changeDate={this.props.onDateChange}
                         toggleCalendar={this.toggleCalendar}
                         isCalendarOpened={isCalendarOpened}

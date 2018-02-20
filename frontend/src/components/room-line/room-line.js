@@ -72,14 +72,14 @@ class RoomLine extends React.Component {
             eventMinutes = parseInt(eventMinutes % 60);
         }
 
-        const start = moment(this.props.date).set({hour: eventHours, minute: eventMinutes});
+        const start = moment(this.props.date, "DD MMMM YYYY").set({hour: eventHours, minute: eventMinutes});
         const end = moment(start).add(30, "minutes");
 
         return {
             roomId: this.props.roomId,
-            date: start.format("DD MM YYYY"),
-            startTime: start.format("LT"),
-            endTime: end.format("LT")
+            date: start.format("YYYY-MM-DD"),
+            startTime: start.format("HH:mm"),
+            endTime: end.format("HH:mm")
         };
     }
 

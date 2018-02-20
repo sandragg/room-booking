@@ -1,7 +1,9 @@
 export {
     setDate,
+    createEvent,
+    removeEvent,
     getEventById,
     getUserList,
     getRoomList,
-    getEventList
+    getEventsByDate
 } from "./actions";
