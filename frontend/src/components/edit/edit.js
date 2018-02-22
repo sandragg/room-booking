@@ -34,7 +34,7 @@ class EditPage extends React.Component {
         this.state = {
             id: this.id | null,
             title: "",
-            membersIds: [],
+            usersIds: [],
             date: "",
             startTime: "",
             endTime: "",
@@ -52,7 +52,7 @@ class EditPage extends React.Component {
 
         if (!this.id) {
             this.title = "Новая встреча";
-            this.footerContent = <Button primary onClick={()=>this.setState({isCreated: true})}>Создать встречу</Button>;
+            this.footerContent = <Button primary onClick={() => this.isEventValid()}>Создать встречу</Button>;
         } else {
             this.title = "Редактирование встречи";
             this.footerContent = (
@@ -63,7 +63,7 @@ class EditPage extends React.Component {
             );
         }
 
-        this.isEventValid = ::this.isEventValid;
+        this.isEventValid = this.isEventValid.bind(this);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -72,7 +72,7 @@ class EditPage extends React.Component {
 
             this.setState({
                 title: event.title,
-                membersIds: event.users.map(user => user.id),
+                usersIds: event.users.map(user => user.id),
                 date: moment(event.dateStart).format("YYYY-MM-DD"),
                 startTime: moment(event.dateStart).format("HH:mm"),
                 endTime: moment(event.dateEnd).format("HH:mm"),
@@ -82,12 +82,48 @@ class EditPage extends React.Component {
     }
 
     isEventValid() {
+        console.log(1,this);
+        const {roomId, title, date, startTime, endTime, usersIds} = this.state;
+        let day = moment(date, "YYYY-MM-DD", true),
+            start = moment(startTime, "HH:mm", true),
+            end = moment(endTime, "HH:mm", true);
+        let newEvent = {};
+        console.log(day, start, end)
+        if (roomId === null
+            || !title.length
+            || !day.isValid()
+            || !start.isValid()
+            || !end.isValid()
+            || !end.isAfter(start)
+            || start.hour() < 8 // убрать, когда будет ф-я подбора комнат
+            || (end.hour() > 23 // убрать, когда будет ф-я подбора комнат
+                || (end.hour() === 23 // убрать, когда будет ф-я подбора комнат
+                    && end.minute())) // убрать, когда будет ф-я подбора комнат
+        ) {console.log("invalid"); return;}
+
+        this.props.createEvent({
+            usersIds,
+            roomId,
+            input: {
+                title,
+                dateStart: day.set({hour: start.hour(), minute: start.minute()}).format(),
+                dateEnd: day.set({hour: end.hour(), minute: end.minute()}).format()
+            }
+        })
+            .then(res => this.setState({isCreated: true}))
+            .catch(err => { throw new Error(err)});
+
 
     }
 
     render() {
         const {userList, roomList, removeEvent} = this.props;
-        console.log(this.props);
+        const {
+            title, date, startTime,
+            endTime, roomId, usersIds,
+            isRemoved, isCreated
+        } = this.state;
+console.log(date, startTime, endTime);
         return (
             <Column>
                 <Header/>
@@ -103,9 +139,9 @@ class EditPage extends React.Component {
                             <EditColumn>
                                 <Input label="Тема"
                                        placeholder="О чем будете говорить?"
-                                       value={this.state.title}
+                                       value={title}
                                        onChange={(e) => this.setState({title: e.target.value})}
-                                       valid={this.state.title.length > 0}
+                                       valid={title.length > 0}
                                 />
                                 <AutocompleteChipsContainer
                                     titleKey="login"
@@ -113,8 +149,8 @@ class EditPage extends React.Component {
                                     avatarKey="avatarUrl"
                                     placeholder="Например, Тор Одинович"
                                     label="Участники"
-                                    selectedItems={this.state.membersIds}
-                                    onPropChange={(ids) => this.setState({membersIds: ids})}
+                                    selectedItems={usersIds}
+                                    onPropChange={(ids) => this.setState({usersIds: ids})}
                                     items={userList || []}
                                 />
                             </EditColumn>
@@ -125,8 +161,8 @@ class EditPage extends React.Component {
                                             type="date"
                                             label="Дата"
                                             grow="3"
-                                            value={this.state.date}
-                                            valid={moment(this.state.date, "YYYY-MM-DD", true).isValid()}
+                                            value={date}
+                                            valid={moment(date, "YYYY-MM-DD", true).isValid()}
                                             onChange={(e) => this.setState({date: e.target.value})}
                                         />
                                     </InputWrapper>
@@ -134,8 +170,8 @@ class EditPage extends React.Component {
                                         <Input
                                             type="time"
                                             label="Начало" grow="2"
-                                            value={this.state.startTime}
-                                            valid={moment(this.state.startTime, "HH:mm", true).isValid()}
+                                            value={startTime}
+                                            valid={moment(startTime, "HH:mm", true).isValid()}
                                             onChange={(e) => this.setState({startTime: e.target.value})}
                                         />
                                     </InputWrapper>
@@ -146,8 +182,8 @@ class EditPage extends React.Component {
                                         <Input
                                             type="time"
                                             label="Конец"
-                                            value={this.state.endTime}
-                                            valid={moment(this.state.endTime, "HH:mm", true).isValid()}
+                                            value={endTime}
+                                            valid={moment(endTime, "HH:mm", true).isValid()}
                                             onChange={(e) => this.setState({endTime: e.target.value})}
                                         />
                                     </InputWrapper>
@@ -155,7 +191,7 @@ class EditPage extends React.Component {
                                 <SelectionListContainer
                                     onPropChange={(id) => this.setState({roomId: id})}
                                     items={roomList || []}
-                                    selectedItem={this.state.roomId}
+                                    selectedItem={roomId}
                                     event={this.state}
                                 />
                             </EditColumn>
@@ -169,23 +205,23 @@ class EditPage extends React.Component {
                     {this.footerContent}
                 </Footer>
                 {
-                    this.state.isRemoved
+                    isRemoved
                         ? <DialogBox
                             title="Вы действительно хотите удалить встречу?"
-                            subtitle={this.state.title}
-                            text={`${moment(this.state.date).format("DD MMMM YYYY")}, ${this.state.startTime}`}
+                            subtitle={title}
+                            text={`${moment(date).format("DD MMMM YYYY")}, ${startTime}`}
                             isDialog
                             img={forbid}
-                            onClick={() => removeEvent(this.state.id)}
+                            onClick={() => removeEvent(this.id)}
                         />
                         : null
                 }
                 {
-                    this.state.isCreated
+                    isCreated
                         ? <DialogBox
                             title="Встреча была успешно создана!"
-                            subtitle={this.state.title}
-                            text={`${moment(this.state.date).format("DD MMMM YYYY")}, ${this.state.startTime}`}
+                            subtitle={title}
+                            text={`${moment(date).format("DD MMMM YYYY")}, ${startTime}`}
                             img={success}
                         />
                         : null

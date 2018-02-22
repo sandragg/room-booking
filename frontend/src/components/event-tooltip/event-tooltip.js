@@ -36,11 +36,11 @@ export default ({event, id, onIconClick}) => {
                     <EventParticipantsWrapperStyled>
                         <EventParticipantsStyled>
                             <EventMainParticipantStyled>
-                                {users[0].login}
+                                {users[0] ? users[0].login : null}
                             </EventMainParticipantStyled>
                             &nbsp;
                             <EventParticipantsOtherStyled>
-                                {`и ${users.length - 1} участников`}
+                                {(users[0] ? `и ${users.length - 1}` : 0) + " участников"}
                             </EventParticipantsOtherStyled>
                         </EventParticipantsStyled>
                     </EventParticipantsWrapperStyled>

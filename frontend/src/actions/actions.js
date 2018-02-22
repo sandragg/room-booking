@@ -9,27 +9,47 @@ const actionCreators = createActions({
 
 export const {setDate} = actionCreators;
 
+const noonTime = {
+    'hour': 12,
+    'minute': 0,
+    'second': 0,
+    'millisecond': 0
+};
+
 /*
     Create a new object
  */
 export const createEvent = graphql(
     gql`mutation createEvent($input: EventInput!, $usersIds: [ID], $roomId: ID!) {
         createEvent(input: $input, usersIds: $usersIds, roomId: $roomId) {
-            title, dateStart, room{id}
+            id, title, dateStart, dateEnd, room{id}, users{id, login, avatarUrl}
         }
     }`,
     {
         props: ({mutate}) => ({
             createEvent: (event) => mutate({
                 variables: {
-                    usersIds: event.membersIds,
+                    usersIds: event.usersIds,
                     roomId: event.roomId,
-                    input: {...event} // ?????
+                    input: {...event.input}
                 }
             })
-        })
+        }),
+        options: {
+            update: (proxy, {data: {createEvent}}) => {
+                const date = moment(createEvent.dateStart).set(noonTime).format();
+                const data = proxy.readQuery({
+                    query: eventsByDateQuery,
+                    variables: {date}
+                });
+
+                data.eventsByDate.push(createEvent);
+                proxy.writeQuery({query: eventsByDateQuery, variables: {date}, data});
+            }
+        }
     }
 );
+
 
 /*
     Update an object
@@ -54,13 +74,19 @@ export const createEvent = graphql(
 // );
 
 
+const eventsByDateQuery = gql`query ($date: Date!) {
+   eventsByDate(date: $date) {
+        id, title, dateStart, dateEnd, room{id}, users{id, login, avatarUrl}
+   }
+}`;
+
 /*
     Delete an object
  */
 export const removeEvent = graphql(
     gql`mutation removeEvent($id: ID!) {
        removeEvent(id: $id) {
-            title, dateStart, room{id}
+            id, dateStart
         }
     }`,
     {
@@ -70,29 +96,26 @@ export const removeEvent = graphql(
             })
         }),
         options: {
-            refetchQueries: ({data: {removeEvent}}) => {
-                console.log(moment(removeEvent.dateStart));
-                return [{
-                    query: gql`
-                      query ($date: Date!) {
-                        eventsByDate(date: $date) {
-                            id, title, dateStart, dateEnd, room{id}, users{id, login, avatarUrl}
-                        }
-                    }
-                    `,
-                    variables: {
-                        date: moment(removeEvent.dateStart).set({
-                            'hour': 12,
-                            'minute': 0,
-                            'second': 0,
-                            'millisecond': 0
-                        }).format()
-                    }
-                }]
-            },
-        },
-    }
-);
+            update: (proxy, {data: {removeEvent}}) => {
+                const {id, dateStart} = removeEvent;
+                const date = moment(dateStart).set(noonTime).format();
+                const data = proxy.readQuery({
+                    query: eventsByDateQuery,
+                    variables: {date}
+                });
+                const events = data.eventsByDate;
+                const index = events.findIndex(item => item.id === id);
+
+                if (events.length > 1) {
+                    events[index] = events[events.length - 1];
+                    delete events[events.length];
+                }
+                (events.length)--;
+
+                proxy.writeQuery({query: eventsByDateQuery, variables: {date}, data});
+            }
+        }
+});
 
 
 /*
@@ -129,11 +152,7 @@ export const getRoomList = graphql(
 );
 
 export const getEventsByDate = graphql(
-    gql`query ($date: Date!) {
-        eventsByDate(date: $date) {
-            id, title, dateStart, dateEnd, room{id}, users{id, login, avatarUrl}
-        }
-    }`,
+    eventsByDateQuery,
     {
         options: (props) => ({
             variables: {date: moment(props.date, "DD MMMM YYYY").add(12, "hours").format()}
