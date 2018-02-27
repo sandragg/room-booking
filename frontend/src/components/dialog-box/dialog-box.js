@@ -12,7 +12,7 @@ import {
 } from "./dialog-box-styled";
 import {Button} from "../button/button-styled";
 
-export const DialogBox = ({title, subtitle, text, isDialog, img, onClick}) => {
+export const DialogBox = ({title, subtitle, text, isDialog, img, onSubmitClick, onCancelClick}) => {
     return (
         <Modal>
             <OuterWrapper/>
@@ -23,11 +23,11 @@ export const DialogBox = ({title, subtitle, text, isDialog, img, onClick}) => {
                 <DialogBoxText>{text}</DialogBoxText>
                 <DialogBoxSubmitWrapper>
                     <Link to="/">
-                        <Button default onClick={onClick}>Ок</Button>
+                        <Button default onClick={onSubmitClick}>Ок</Button>
                     </Link>
                     {
                         isDialog
-                            ? <Button default>Отмена</Button>
+                            ? <Button default onClick={onCancelClick}>Отмена</Button>
                             : null
                     }
                 </DialogBoxSubmitWrapper>

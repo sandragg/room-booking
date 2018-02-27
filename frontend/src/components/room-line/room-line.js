@@ -4,7 +4,7 @@ import moment from "moment";
 import {Link} from "react-router-dom";
 
 import {RoomLineWrapperStyled, RoomLineContentStyled} from "./room-line-styled";
-import {ONE_MINUTE_WIDTH, startHour} from "../constants";
+import {ONE_MINUTE_WIDTH, START_HOUR} from "../constants";
 import Event from "../event";
 import NewEvent from "../new-event";
 
@@ -17,13 +17,16 @@ class RoomLine extends React.Component {
             newEventOffset: null,
             roomLineLeftOffset: null,
             roomLineRightOffset: null,
-            roomLineWidth: null
+            roomLineWidth: null,
+            available: false,
+            newEventDuration: null
         };
 
         this.createNewEvent = this.createNewEvent.bind(this);
         this.showNewEvent = this.showNewEvent.bind(this);
         this.hideNewEvent = this.hideNewEvent.bind(this);
         this.calcNewEventOffset = this.calcNewEventOffset.bind(this);
+        this.calcNewEventDuration = this.calcNewEventDuration.bind(this);
     };
 
     showNewEvent(e) {
@@ -48,66 +51,99 @@ class RoomLine extends React.Component {
             && e.relatedTarget.id !== "room-line"
             && e.relatedTarget.id !== "new-event"
         ) {
-            this.setState({hover: false, roomLineLeftOffset: null});
+            this.setState({hover: false, roomLineLeftOffset: null, available: false});
         }
+    }
+
+    calcNewEventDuration(eventOffset) {
+        const {date} = this.props;
+        const minuteOffset = this.state.roomLineWidth * ONE_MINUTE_WIDTH / 100;
+        let eventMinutes = eventOffset / minuteOffset - 15,
+            eventHours;
+
+        eventHours = parseInt(eventMinutes / 60 + START_HOUR);
+        eventMinutes = parseInt(eventMinutes % 60);
+
+        if (eventMinutes < 0) eventHours = START_HOUR;
+
+        const start = moment(date, "DD MMMM YYYY").set({hour: eventHours, minute: eventMinutes});
+        const end = moment(start).add(30, "minutes");
+
+        return {
+            dateStart: start.format(),
+            dateEnd: end.format()
+        }
+    }
+
+    checkFreeEventsBounds(newEvent) {
+        const {freeEvents} = this.props;
+        const {length} = freeEvents;
+        const end = moment(newEvent.dateEnd), start = moment(newEvent.dateStart);
+
+        for (let i = 0; i < length; i++) {
+            if (!end.isAfter(freeEvents[i][1]))
+                return start.isSameOrAfter(freeEvents[i][0]);
+        }
+
+        return false;
     }
 
     calcNewEventOffset(e) {
-        if (this.state.hover && e.target.id !== "event") {
-            e.pageX < this.state.roomLineLeftOffset || e.pageX > this.state.roomLineRightOffset
-                ? this.setState({hover: false, roomLineLeftOffset: null})
-                : this.setState({newEventOffset: e.pageX - this.state.roomLineLeftOffset});
-        }
+        if (!this.state.hover) return;
+
+        const newEventOffset = e.pageX - this.state.roomLineLeftOffset;
+        const newEventDuration = this.calcNewEventDuration(newEventOffset);
+
+        this.setState({
+            newEventOffset,
+            newEventDuration,
+            available: this.checkFreeEventsBounds(newEventDuration)
+        });
     }
 
     createNewEvent() {
-        const minuteOffset = this.state.roomLineWidth * ONE_MINUTE_WIDTH / 100;
-        let eventMinutes = this.state.newEventOffset / minuteOffset - 15, eventHours;
-
-        if (eventMinutes < 0) {
-            eventMinutes = 0;
-            eventHours = startHour;
-        } else {
-            eventHours = parseInt(eventMinutes / 60 + startHour);
-            eventMinutes = parseInt(eventMinutes % 60);
-        }
-
-        const start = moment(this.props.date, "DD MMMM YYYY").set({hour: eventHours, minute: eventMinutes});
-        const end = moment(start).add(30, "minutes");
+        const {dateStart, dateEnd} = this.state.newEventDuration;
+        const start = moment(dateStart);
 
         return {
             roomId: this.props.roomId,
             date: start.format("YYYY-MM-DD"),
             startTime: start.format("HH:mm"),
-            endTime: end.format("HH:mm")
+            endTime: moment(dateEnd).format("HH:mm")
         };
     }
 
     render() {
+        const {available, newEventOffset} = this.state;
+        const {events, disabled} = this.props;
+
         return (
             <RoomLineWrapperStyled>
                 <RoomLineContentStyled
                     id="room-line"
-                    onMouseMove={this.calcNewEventOffset}
-                    onMouseOver={this.showNewEvent}
-                    onMouseOut={this.hideNewEvent}
+                    onMouseMove={disabled ? null : this.calcNewEventOffset}
+                    onMouseOver={disabled ? null : this.showNewEvent}
+                    onMouseOut={disabled ? null : this.hideNewEvent}
                 >
-                    {this.props.events.map(event =>
-                        <Event id="event"
-                           key={"event" + event.dateStart}
-                           event={event}
-                        />
-                    )}
-                    {this.state.hover
-                        ? <Link to={{
+                    {
+                        events.map(event =>
+                            <Event id="event"
+                                   key={"event" + event.dateStart}
+                                   event={event}
+                            />
+                        )
+                    }
+                    {
+                        available
+                            ? <Link to={{
                                 pathname: "create",
                                 state: {
                                     event: this.createNewEvent()
                                 }
                             }}>
-                                <NewEvent id="new-event" offset={this.state.newEventOffset}/>
+                                <NewEvent id="new-event" offset={newEventOffset}/>
                             </Link>
-                        : null
+                            : null
                     }
                 </RoomLineContentStyled>
             </RoomLineWrapperStyled>

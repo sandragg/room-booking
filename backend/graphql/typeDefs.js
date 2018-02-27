@@ -65,8 +65,8 @@ module.exports = `
       updateRoom(id: ID!, input: RoomInput!): Room
       removeRoom(id: ID!): Room
     
-      createEvent(input: EventInput!, usersIds: [ID], roomId: ID!): Event
-      updateEvent(id: ID!, input: EventInput!): Event
+      createEvent(input: EventInput!, usersIds: [ID]!, roomId: ID!): Event
+      updateEvent(id: ID!, input: EventInput!, usersIds: [ID]!, roomId: ID!): Event
       removeUserFromEvent(id: ID!, userId: ID!): Event
       addUserToEvent(id: ID!, userId: ID!): Event
       changeEventRoom(id: ID!, roomId: ID!): Event

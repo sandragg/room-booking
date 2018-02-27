@@ -7,13 +7,13 @@ import {
 } from "./room-list-item-styled";
 import RoomLineContainer from "../room-line";
 
-export default ({disabled, title, subtitle, events, roomId}) => (
+export default ({disabled, title, subtitle, events, freeEvents, roomId}) => (
     <RoomListItemWrapperStyled>
         <RoomListItemStyled disabled={disabled}>
             <RoomListItemTitleStyled disabled={disabled}>{title}</RoomListItemTitleStyled>
             <RoomListItemSubtitleStyled disabled={disabled}>{subtitle}</RoomListItemSubtitleStyled>
         </RoomListItemStyled>
-        <RoomLineContainer events={events} roomId={roomId}/>
+        <RoomLineContainer disabled={disabled} events={events} freeEvents={freeEvents} roomId={roomId}/>
     </RoomListItemWrapperStyled>
 
 );

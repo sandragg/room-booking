@@ -3,7 +3,11 @@ import {Link} from "react-router-dom";
 import {connect} from "react-redux";
 import {compose} from 'react-apollo';
 
-import * as actionCreators from "../../actions";
+import {setDate} from "../../redux-actions";
+import {
+    getRoomList,
+    getEventsByDate
+} from "../../apollo-actions";
 import {Column} from "../common-style";
 import {Button} from "../button";
 import {Header} from "../header";
@@ -26,8 +30,8 @@ const HomePage = ({roomList, eventList, date, onDateChange}) => (
 );
 
 const HomePageWithData = compose(
-    actionCreators.getRoomList,
-    actionCreators.getEventsByDate
+    getRoomList,
+    getEventsByDate
 )(HomePage);
 
 const mapStateToProps = (store) => ({
@@ -35,7 +39,7 @@ const mapStateToProps = (store) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    onDateChange: (date) => dispatch(actionCreators.setDate(date))
+    onDateChange: (date) => dispatch(setDate(date))
 });
 
 export const Home = connect(

@@ -7,7 +7,8 @@ module.exports = {
 
     output: {
         path: __dirname + "/build",
-        filename: "[name].js"
+        filename: "[name].js",
+        publicPath: "/"
     },
 
     watch: true,

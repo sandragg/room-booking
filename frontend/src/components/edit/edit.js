@@ -1,7 +1,16 @@
 import React from "react";
 import {Link} from "react-router-dom";
 import {compose} from 'react-apollo';
-import * as actionCreators from "../../actions";
+import {connect} from "react-redux";
+
+import {
+    createEvent,
+    removeEvent,
+    getEventsByDate,
+    getEventById,
+    getRoomList,
+    getUserList
+} from "../../apollo-actions";
 import moment from "moment";
 
 import {
@@ -82,13 +91,12 @@ class EditPage extends React.Component {
     }
 
     isEventValid() {
-        console.log(1,this);
         const {roomId, title, date, startTime, endTime, usersIds} = this.state;
         let day = moment(date, "YYYY-MM-DD", true),
             start = moment(startTime, "HH:mm", true),
             end = moment(endTime, "HH:mm", true);
         let newEvent = {};
-        console.log(day, start, end)
+
         if (roomId === null
             || !title.length
             || !day.isValid()
@@ -99,7 +107,7 @@ class EditPage extends React.Component {
             || (end.hour() > 23 // убрать, когда будет ф-я подбора комнат
                 || (end.hour() === 23 // убрать, когда будет ф-я подбора комнат
                     && end.minute())) // убрать, когда будет ф-я подбора комнат
-        ) {console.log("invalid"); return;}
+        ) return;
 
         this.props.createEvent({
             usersIds,
@@ -111,7 +119,7 @@ class EditPage extends React.Component {
             }
         })
             .then(res => this.setState({isCreated: true}))
-            .catch(err => { throw new Error(err)});
+            .catch(err => console.error(err));
 
 
     }
@@ -123,7 +131,7 @@ class EditPage extends React.Component {
             endTime, roomId, usersIds,
             isRemoved, isCreated
         } = this.state;
-console.log(date, startTime, endTime);
+
         return (
             <Column>
                 <Header/>
@@ -212,7 +220,8 @@ console.log(date, startTime, endTime);
                             text={`${moment(date).format("DD MMMM YYYY")}, ${startTime}`}
                             isDialog
                             img={forbid}
-                            onClick={() => removeEvent(this.id)}
+                            onSubmitClick={() => removeEvent(this.id)}
+                            onCancelClick={() => this.setState({isRemoved: false})}
                         />
                         : null
                 }
@@ -231,10 +240,19 @@ console.log(date, startTime, endTime);
     }
 }
 
-export const Edit = compose(
-    actionCreators.createEvent,
-    actionCreators.removeEvent,
-    actionCreators.getEventById,
-    actionCreators.getRoomList,
-    actionCreators.getUserList
+const EditPageWithData = compose(
+    createEvent,
+    removeEvent,
+    getEventById,
+    getEventsByDate,
+    getRoomList,
+    getUserList
 )(EditPage);
+
+const mapStateToProps = (store) => ({
+    date: store.date
+});
+
+export const Edit = connect(
+    mapStateToProps
+)(EditPageWithData);

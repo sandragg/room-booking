@@ -1,5 +1,4 @@
 export {
-    setDate,
     createEvent,
     removeEvent,
     getEventById,

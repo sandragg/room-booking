@@ -7,11 +7,14 @@ import {
     RoomListFloorWrapperStyled
 } from "./room-list-styled";
 
-export default ({rooms, events}) => (
+const empty = [];
+
+export default ({rooms, freeEventsByRoom, eventsByRoom}) => (
     <RoomListWrapperStyled>
         <RoomListStyled>
             {
-                Object.keys(rooms).reverse().map(floor => (
+                rooms
+                    ? Object.keys(rooms).reverse().map(floor => (
                     <RoomListFloorWrapperStyled key={floor + "floor"}>
                         <RoomListFloorStyled>{floor} ЭТАЖ</RoomListFloorStyled>
                         {
@@ -21,12 +24,27 @@ export default ({rooms, events}) => (
                                     roomId={room.id}
                                     title={room.title}
                                     subtitle={`до ${room.capacity} человек`}
-                                    events={events.filter(event => event.room.id === room.id)}
+                                    events={
+                                        eventsByRoom[room.id]
+                                            ? eventsByRoom[room.id]
+                                            : empty
+                                    }
+                                    freeEvents={
+                                        freeEventsByRoom
+                                            ? freeEventsByRoom[room.id]
+                                            : null
+                                    }
+                                    disabled={
+                                        freeEventsByRoom
+                                            ? !freeEventsByRoom[room.id].length
+                                            : false
+                                    }
                                 />
                             ))
                         }
                     </RoomListFloorWrapperStyled>
                 ))
+                    : null
             }
         </RoomListStyled>
     </RoomListWrapperStyled>

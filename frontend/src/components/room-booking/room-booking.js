@@ -10,7 +10,7 @@ import {
 import BookingDate from "../booking-date";
 import TimeLine from "../time-line";
 import RoomList from "../room-list";
-import {ONE_MINUTE_WIDTH, ONE_HOUR_WIDTH, startHour, endHour} from "../constants";
+import {ONE_MINUTE_WIDTH, ONE_HOUR_WIDTH, START_HOUR, END_HOUR} from "../constants";
 
 export class RoomBooking extends React.Component {
     constructor(props) {
@@ -18,13 +18,14 @@ export class RoomBooking extends React.Component {
 
         moment.locale("ru");
 
-        this.hoursLength = endHour - startHour + 1;
+        this.hoursLength = END_HOUR - START_HOUR + 1;
         this.eightHours = 60 * 8;
-        this.hours = Array.apply(null, {length: this.hoursLength}).map((e, i) => i + startHour);
+        this.hours = Array.apply(null, {length: this.hoursLength}).map((e, i) => i + START_HOUR);
 
         this.state = {
-            rooms: {},
-            events: [],
+            rooms: null,
+            eventsByRoom: null,
+            freeEventsByRoom: null,
             isCalendarOpened: false,
             time: moment().format("LT")
         };
@@ -43,25 +44,80 @@ export class RoomBooking extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({
-            rooms: nextProps.rooms ? this.mapRoomsToState(nextProps.rooms) : {},
-            events: nextProps.events ? this.mapEventsToState(nextProps.events) : []
+        // TODO заменить все пустые {},[] на null и добавить проверки ?!
+        if (nextProps.rooms && nextProps.events)
+            this.setState({
+                rooms: this.mapRoomsToState(nextProps.rooms),
+                eventsByRoom: this.mapEventsToState(nextProps.events),
+                freeEventsByRoom: null
+            })
+    }
+
+    componentDidUpdate() {
+        if (this.state.eventsByRoom && !this.state.freeEventsByRoom)
+            this.setState({
+                freeEventsByRoom: this.mapFreeEventsToState(this.state.eventsByRoom)
+            });
+    }
+
+    mapFreeEventsToState(eventsByRoom) {
+        const {date, rooms} = this.props,
+            startOfDay = moment(date, "DD MMMM YYYY").set("hours", START_HOUR).format(),
+            endOfDay = moment(date, "DD MMMM YYYY").set("hours", END_HOUR).format();
+        let freeEvents = {},
+            freeStartTime;
+
+        for (let key in eventsByRoom) {
+            freeStartTime = startOfDay;
+
+            freeEvents[key] = eventsByRoom[key].reduce((freeEventsList, event) => {
+                if (moment(event.dateStart).diff(freeStartTime, "minutes") >= 30) {
+                    freeEventsList.push([freeStartTime, event.dateStart]);
+                }
+                freeStartTime = event.dateEnd;
+
+                return freeEventsList;
+            }, []);
+
+            if (moment(endOfDay).diff(freeStartTime, "minutes") >= 30)
+                freeEvents[key].push([freeStartTime, endOfDay]);
+        }
+
+        rooms.forEach(room => {
+            if (!freeEvents[room.id]) freeEvents[room.id] = [[startOfDay, endOfDay]];
         });
+
+        return freeEvents;
     }
 
     mapEventsToState(events) {
-        return events.map(event => {
-            const start = moment(event.dateStart);
-            const end = moment(event.dateEnd);
-            const duration = moment.duration(end.diff(start)).asMinutes();
-            const offset = start.hours() * 60 + start.minutes();
+        let start, end, duration, offset, newEvent, roomId;
 
-            return {
-                ...event,
-                width: Math.abs(duration * ONE_MINUTE_WIDTH),
-                offset: Math.abs((offset - this.eightHours) * ONE_MINUTE_WIDTH)
-            };
-        });
+        return [...events]
+            .sort((first, second) =>
+                moment(first.dateStart).isAfter(second.dateStart) ? 1 : -1
+            )
+            .reduce((eventList, event) => {
+                start = moment(event.dateStart);
+                end = moment(event.dateEnd);
+                duration = moment.duration(end.diff(start)).asMinutes();
+                offset = start.hours() * 60 + start.minutes();
+                roomId = event.room.id;
+                newEvent = {
+                    ...event,
+                    width: Math.abs(duration * ONE_MINUTE_WIDTH),
+                    offset: Math.abs((offset - this.eightHours) * ONE_MINUTE_WIDTH)
+                };
+
+                if (eventList[roomId]) {
+                    eventList[roomId].push(newEvent);
+                }
+                else {
+                    eventList[roomId] = [newEvent];
+                }
+
+                return eventList;
+            }, {});
     }
 
     mapRoomsToState(rooms) {
@@ -95,7 +151,7 @@ export class RoomBooking extends React.Component {
     }
 
     render() {
-        const {time, rooms, events, isCalendarOpened} = this.state;
+        const {time, rooms, eventsByRoom, freeEventsByRoom, isCalendarOpened} = this.state;
         const offset = this.calculateTickerOffset();
 
         return (
@@ -117,7 +173,8 @@ export class RoomBooking extends React.Component {
                     <RoomBookingDiagramContentStyled>
                         <RoomList
                             rooms={rooms}
-                            events={events}
+                            eventsByRoom={eventsByRoom}
+                            freeEventsByRoom={freeEventsByRoom}
                         />
                     </RoomBookingDiagramContentStyled>
                 </RoomBookingDiagramWrapperStyled>

@@ -15,7 +15,7 @@ import {
 import moment from "moment";
 import {Icon} from "../icon";
 
-export default ({event, id, onIconClick}) => {
+export default ({event, id}) => {
     const {title, dateStart, dateEnd, room, users} = event;
     const date = moment(dateStart, moment.ISO).format("DD MMM");
     const timeStart = moment(dateStart).format("LT");
