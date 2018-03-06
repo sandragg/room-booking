@@ -36,7 +36,7 @@ export default ({rooms, freeEventsByRoom, eventsByRoom}) => (
                                     }
                                     disabled={
                                         freeEventsByRoom
-                                            ? !freeEventsByRoom[room.id].length
+                                            ? !(freeEventsByRoom[room.id].length)
                                             : false
                                     }
                                 />

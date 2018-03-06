@@ -77,15 +77,11 @@ class RoomLine extends React.Component {
 
     checkFreeEventsBounds(newEvent) {
         const {freeEvents} = this.props;
-        const {length} = freeEvents;
         const end = moment(newEvent.dateEnd), start = moment(newEvent.dateStart);
 
-        for (let i = 0; i < length; i++) {
-            if (!end.isAfter(freeEvents[i][1]))
-                return start.isSameOrAfter(freeEvents[i][0]);
-        }
-
-        return false;
+        return freeEvents.some(event => (
+            !end.isAfter(event[1]) && start.isSameOrAfter(event[0])
+        ));
     }
 
     calcNewEventOffset(e) {
@@ -121,9 +117,9 @@ class RoomLine extends React.Component {
             <RoomLineWrapperStyled>
                 <RoomLineContentStyled
                     id="room-line"
-                    onMouseMove={disabled ? null : this.calcNewEventOffset}
-                    onMouseOver={disabled ? null : this.showNewEvent}
-                    onMouseOut={disabled ? null : this.hideNewEvent}
+                    onMouseMove={!disabled && this.calcNewEventOffset}
+                    onMouseOver={!disabled && this.showNewEvent}
+                    onMouseOut={!disabled && this.hideNewEvent}
                 >
                     {
                         events.map(event =>

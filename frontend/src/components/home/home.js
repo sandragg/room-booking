@@ -2,6 +2,7 @@ import React from "react";
 import {Link} from "react-router-dom";
 import {connect} from "react-redux";
 import {compose} from 'react-apollo';
+import moment from "moment";
 
 import {setDate} from "../../redux-actions";
 import {
@@ -16,7 +17,10 @@ import {RoomBooking} from "../room-booking/room-booking";
 const HomePage = ({roomList, eventList, date, onDateChange}) => (
     <Column>
         <Header>
-            <Link to="create">
+            <Link to={{
+                pathname: "create",
+                state: {event: {date: moment(date, "DD MMMM YYYY").format("YYYY-MM-DD")}}
+            }}>
                 <Button primary>Создать встречу</Button>
             </Link>
         </Header>
@@ -34,7 +38,7 @@ const HomePageWithData = compose(
     getEventsByDate
 )(HomePage);
 
-const mapStateToProps = (store) => ({
+const mapStateToProps = (store, props) => ({
     date: store.date
 });
 

@@ -16,8 +16,6 @@ export class RoomBooking extends React.Component {
     constructor(props) {
         super(props);
 
-        moment.locale("ru");
-
         this.hoursLength = END_HOUR - START_HOUR + 1;
         this.eightHours = 60 * 8;
         this.hours = Array.apply(null, {length: this.hoursLength}).map((e, i) => i + START_HOUR);
@@ -64,30 +62,32 @@ export class RoomBooking extends React.Component {
         const {date, rooms} = this.props,
             startOfDay = moment(date, "DD MMMM YYYY").set("hours", START_HOUR).format(),
             endOfDay = moment(date, "DD MMMM YYYY").set("hours", END_HOUR).format();
-        let freeEvents = {},
-            freeStartTime;
+        let freeStartTime;
 
-        for (let key in eventsByRoom) {
-            freeStartTime = startOfDay;
-
-            freeEvents[key] = eventsByRoom[key].reduce((freeEventsList, event) => {
-                if (moment(event.dateStart).diff(freeStartTime, "minutes") >= 30) {
-                    freeEventsList.push([freeStartTime, event.dateStart]);
+        return rooms
+            .map(room => room.id)
+            .reduce((freeEventsByRoom, roomId) => {
+                if (!eventsByRoom[roomId]) {
+                    freeEventsByRoom[roomId] = [[startOfDay, endOfDay]];
+                    return freeEventsByRoom;
                 }
-                freeStartTime = event.dateEnd;
 
-                return freeEventsList;
-            }, []);
+                freeStartTime = startOfDay;
 
-            if (moment(endOfDay).diff(freeStartTime, "minutes") >= 30)
-                freeEvents[key].push([freeStartTime, endOfDay]);
-        }
+                freeEventsByRoom[roomId] = eventsByRoom[roomId].reduce((freeEventList, event) => {
+                    if (moment(event.dateStart).diff(freeStartTime, "minutes") >= 30) {
+                        freeEventList.push([freeStartTime, event.dateStart]);
+                    }
+                    freeStartTime = event.dateEnd;
 
-        rooms.forEach(room => {
-            if (!freeEvents[room.id]) freeEvents[room.id] = [[startOfDay, endOfDay]];
-        });
+                    return freeEventList;
+                }, []);
 
-        return freeEvents;
+                if (moment(endOfDay).diff(freeStartTime, "minutes") >= 30)
+                    freeEventsByRoom[roomId].push([freeStartTime, endOfDay]);
+
+                return freeEventsByRoom;
+            }, {});
     }
 
     mapEventsToState(events) {

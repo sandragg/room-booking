@@ -24,7 +24,7 @@ export const InputWrapper = styled.input.attrs({
   width: calc(100% - 24px);
   height: 11px;
   background: #FFFFFF;
-  border: 2px solid ${props => props.valid ? "#E9ECEF" : "#a83b3b"};
+  border: 2px solid #E9ECEF;
   border-radius: 4px;
   padding: 11px 10px 12px;
   line-height: 15px;

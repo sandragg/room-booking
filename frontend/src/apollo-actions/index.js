@@ -1,6 +1,7 @@
 export {
     createEvent,
     removeEvent,
+    updateEvent,
     getEventById,
     getUserList,
     getRoomList,

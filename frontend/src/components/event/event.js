@@ -16,7 +16,7 @@ export default (props) => {
                 id={id}
                 data-tip
                 data-for={eventTooltipId}
-                data-delay-hide={200}
+                data-delay-hide={80}
                 data-effect={'solid'}
                 data-place={'bottom'}
                 data-type={'light'}

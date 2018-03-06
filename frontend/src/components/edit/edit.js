@@ -2,17 +2,23 @@ import React from "react";
 import {Link} from "react-router-dom";
 import {compose} from 'react-apollo';
 import {connect} from "react-redux";
+import moment from "moment";
 
 import {
     createEvent,
     removeEvent,
+    updateEvent,
     getEventsByDate,
     getEventById,
     getRoomList,
     getUserList
 } from "../../apollo-actions";
-import moment from "moment";
-
+import {
+    sortEventsByDate,
+    groupFreeEventsByRoom,
+    groupEventsByRoom
+} from "../../actions/actions";
+import {setDate} from "../../redux-actions/actions";
 import {
     ContentWrapper,
     Content,
@@ -34,14 +40,18 @@ import {DialogBox} from "../dialog-box/dialog-box";
 import forbid from "../../assets/images/emoji1.svg";
 import success from "../../assets/images/emoji2.svg";
 
+const empty = [];
+
 class EditPage extends React.Component {
     constructor(props) {
         super(props);
 
-        this.id = props.match.params.id;
+        this.eventId = props.match.params.id;
+        this.hasEventCreated = !!this.eventId;
         this.options = props.location.state;
+
         this.state = {
-            id: this.id | null,
+            id: null,
             title: "",
             usersIds: [],
             date: "",
@@ -49,87 +59,238 @@ class EditPage extends React.Component {
             endTime: "",
             roomId: null,
             isRemoved: false,
-            isCreated: false
+            isUpdated: false,
+            isCreated: false,
+            freeEventsByRoom: null,
+            freeRooms: null
         };
 
         if (this.options) {
             const {event} = this.options;
 
-            for (let key in event)
-                this.state[key] = event[key];
-        }
-
-        if (!this.id) {
-            this.title = "Новая встреча";
-            this.footerContent = <Button primary onClick={() => this.isEventValid()}>Создать встречу</Button>;
-        } else {
-            this.title = "Редактирование встречи";
-            this.footerContent = (
-                <Row>
-                    <Button default onClick={() => this.setState({isRemoved: true})}>Удалить встречу</Button>
-                    <Button default>Сохранить</Button>
-                </Row>
-            );
+            if (props.date !== event.date) props.onDateChange(moment(event.date));
+            for (let key in event) this.state[key] = event[key];
         }
 
         this.isEventValid = this.isEventValid.bind(this);
-    }
+        this.searchFreeRooms = this.searchFreeRooms.bind(this);
+        this.onRoomClick = this.onRoomClick.bind(this);
+        this.saveEvent = this.saveEvent.bind(this);
+        this.removeEvent = this.removeEvent.bind(this);
 
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.event) {
-            const {event} = nextProps;
-
-            this.setState({
-                title: event.title,
-                usersIds: event.users.map(user => user.id),
-                date: moment(event.dateStart).format("YYYY-MM-DD"),
-                startTime: moment(event.dateStart).format("HH:mm"),
-                endTime: moment(event.dateEnd).format("HH:mm"),
-                roomId: event.room.id
-            })
+        if (!this.hasEventCreated) {
+            this.title = "Новая встреча";
+            this.footerContent = <Button primary onClick={this.saveEvent}>Создать встречу</Button>;
+        }
+        else {
+            this.title = "Редактирование встречи";
+            //TODO remove room func
+            this.footerContent = (
+                <Row>
+                    <Button default onClick={this.removeEvent}>Удалить встречу</Button>
+                    <Button default data-event-id={this.eventId} onClick={this.saveEvent}>Сохранить</Button>
+                </Row>
+            );
         }
     }
 
-    isEventValid() {
+    componentDidUpdate(prevProps, prevState) {
+        const {startTime, endTime, date, freeEventsByRoom, roomId} = this.state;
+        const {event, roomList} = this.props;
+        const newDate = moment(date);
+
+        if (this.hasEventCreated && !prevProps.event) return;
+        if (date !== prevState.date) {
+            const newState = {roomId: null};
+
+            if (newDate.isValid()) {
+                this.props.onDateChange(newDate);
+            }
+            else {
+                newState.freeRooms = null;
+            }
+
+            return this.setState(newState);
+        }
+        if (startTime !== prevState.startTime || endTime !== prevState.endTime) {
+            const newState = {
+                roomId: prevState.roomId ? null : roomId,
+                freeRooms: this.searchFreeRooms(freeEventsByRoom, this.state)
+            };
+
+            if (event) {
+                const start = moment(event.dateStart);
+                const end = moment(event.dateEnd);
+
+                if (start.format("YYYY-MM-DD") === date) {
+                    newState.freeRooms.push({
+                        ...roomList.find(room => room.id === event.room.id),
+                        time: [start.format(), end.format()]
+                    });
+                }
+            }
+
+            return this.setState(newState);
+        }
+    }
+
+    componentWillReceiveProps(nextProps) {
+        const {event, eventList, roomList, date, onDateChange} = nextProps;
+        const hasEventData = this.state.id;
+        const eventListInit = eventList || this.props.eventList;
+        const roomListInit = roomList || this.props.roomList;
+        const eventInit = event || this.props.event;
+
+        if (eventListInit && roomListInit) {
+            let addToState;
+            const start = eventInit ? moment(eventInit.dateStart) : null;
+            const end = eventInit ? moment(eventInit.dateEnd) : null;
+
+            if (this.hasEventCreated && eventInit && !hasEventData) {
+                this.initialDate = eventInit.dateStart;
+                if (start.format("DD MMMM YYYY") !== date) return onDateChange(start);
+
+                addToState = {
+                    id: eventInit.id,
+                    title: eventInit.title,
+                    usersIds: eventInit.users.map(user => user.id),
+                    date: start.format("YYYY-MM-DD"),
+                    startTime: start.format("HH:mm"),
+                    endTime: end.format("HH:mm"),
+                    roomId: eventInit.room.id
+                }
+            }
+            else {
+                const {startTime, endTime, date} = this.state;
+
+                addToState = {startTime, endTime, date};
+            }
+
+            const freeEventsByRoom = groupFreeEventsByRoom(
+                groupEventsByRoom(sortEventsByDate(eventListInit)),
+                roomListInit,
+                date
+            );
+            const freeRooms = this.searchFreeRooms(freeEventsByRoom, addToState);
+
+            if (eventInit && start.format("YYYY-MM-DD") === addToState.date) {
+                freeRooms.push({
+                    ...roomListInit.find(room => room.id === eventInit.room.id),
+                    time: [start.format(), end.format()]
+                });
+            }
+
+            const newState = {
+                ...addToState,
+                freeEventsByRoom,
+                freeRooms
+            };
+
+            this.setState(newState);
+        }
+    }
+
+    saveEvent(e){
+        const id = e.target.dataset.eventId;
         const {roomId, title, date, startTime, endTime, usersIds} = this.state;
-        let day = moment(date, "YYYY-MM-DD", true),
-            start = moment(startTime, "HH:mm", true),
-            end = moment(endTime, "HH:mm", true);
-        let newEvent = {};
-
-        if (roomId === null
-            || !title.length
-            || !day.isValid()
-            || !start.isValid()
-            || !end.isValid()
-            || !end.isAfter(start)
-            || start.hour() < 8 // убрать, когда будет ф-я подбора комнат
-            || (end.hour() > 23 // убрать, когда будет ф-я подбора комнат
-                || (end.hour() === 23 // убрать, когда будет ф-я подбора комнат
-                    && end.minute())) // убрать, когда будет ф-я подбора комнат
-        ) return;
-
-        this.props.createEvent({
+        const day = moment(date, "YYYY-MM-DD", true);
+        const start = moment(startTime, "HH:mm", true);
+        const end = moment(endTime, "HH:mm", true);
+        const {createEvent, updateEvent, event} = this.props;
+        const data = {
             usersIds,
             roomId,
             input: {
                 title,
                 dateStart: day.set({hour: start.hour(), minute: start.minute()}).format(),
                 dateEnd: day.set({hour: end.hour(), minute: end.minute()}).format()
+            },
+        };
+
+        console.log("SAVE WITH DATA", id, data);
+
+        if(this.isEventValid()){
+            if(id){
+                const lastDate = event.dateStart;
+
+                return updateEvent({id, ...data, lastDate})
+                    .then(res => this.setState({isUpdated: true}))
+                    .catch(err => console.error(err));
             }
-        })
-            .then(res => this.setState({isCreated: true}))
-            .catch(err => console.error(err));
 
+            return createEvent(data)
+                .then(res => this.setState({isCreated: true}))
+                .catch(err => console.error(err));
+        }
 
+        console.warn("[EditPage.saveEvent]: Event is not valid!", data);
+
+        return null;
+    }
+
+    removeEvent(e){
+        return this.setState({isRemoved: true});
+    }
+
+    searchFreeRooms(freeEventsByRoom, {startTime, endTime, date}) {
+        if (!freeEventsByRoom) return [];
+
+        const {roomList = []} = this.props;
+        const timeStart = moment(startTime, "HH:mm", true),
+            timeEnd = moment(endTime, "HH:mm", true),
+            day = moment(date);
+        const startDate = timeStart.isValid()
+            ? moment(day).set({"hour": timeStart.hour(), "minute": timeStart.minute()})
+            : day;
+        const endDate = timeEnd.isValid() && timeEnd.isAfter(timeStart)
+            ? moment(day).set({"hour": timeEnd.hour(), "minute": timeEnd.minute()})
+            : day;
+        let time;
+
+        return roomList.reduce((freeRoomList, room) => {
+            if (!freeEventsByRoom[room.id].length) return freeRoomList;
+
+            time = freeEventsByRoom[room.id].find(duration => (
+                moment(startDate).isBetween(duration[0], duration[1], null, '[)')
+            ));
+            if (!time) {
+                time = freeEventsByRoom[room.id][0];
+            }
+            else {
+                time = moment(endDate).isBetween(time[0], time[1], null, '(]') ? [startDate.format(), endDate.format()] : time
+            }
+            freeRoomList.push({...room, time});
+
+            return freeRoomList;
+        }, []);
+    }
+
+    onRoomClick(room) {
+        if (!room) {
+            return this.setState({roomId: null});
+        }
+
+        const {time, id} = room;
+
+        this.setState({
+            roomId: id,
+            startTime: moment(time[0]).format("HH:mm"),
+            endTime: moment(time[1]).format("HH:mm")
+        });
+    }
+
+    isEventValid() {
+        const {roomId, title} = this.state;
+
+        return !(roomId === null || !title.length);
     }
 
     render() {
-        const {userList, roomList, removeEvent} = this.props;
+        const {userList, removeEvent} = this.props;
         const {
             title, date, startTime,
             endTime, roomId, usersIds,
-            isRemoved, isCreated
+            isRemoved, isCreated, isUpdated, freeRooms
         } = this.state;
 
         return (
@@ -149,7 +310,6 @@ class EditPage extends React.Component {
                                        placeholder="О чем будете говорить?"
                                        value={title}
                                        onChange={(e) => this.setState({title: e.target.value})}
-                                       valid={title.length > 0}
                                 />
                                 <AutocompleteChipsContainer
                                     titleKey="login"
@@ -159,7 +319,7 @@ class EditPage extends React.Component {
                                     label="Участники"
                                     selectedItems={usersIds}
                                     onPropChange={(ids) => this.setState({usersIds: ids})}
-                                    items={userList || []}
+                                    items={userList || empty}
                                 />
                             </EditColumn>
                             <EditColumn>
@@ -170,7 +330,6 @@ class EditPage extends React.Component {
                                             label="Дата"
                                             grow="3"
                                             value={date}
-                                            valid={moment(date, "YYYY-MM-DD", true).isValid()}
                                             onChange={(e) => this.setState({date: e.target.value})}
                                         />
                                     </InputWrapper>
@@ -179,7 +338,6 @@ class EditPage extends React.Component {
                                             type="time"
                                             label="Начало" grow="2"
                                             value={startTime}
-                                            valid={moment(startTime, "HH:mm", true).isValid()}
                                             onChange={(e) => this.setState({startTime: e.target.value})}
                                         />
                                     </InputWrapper>
@@ -191,16 +349,14 @@ class EditPage extends React.Component {
                                             type="time"
                                             label="Конец"
                                             value={endTime}
-                                            valid={moment(endTime, "HH:mm", true).isValid()}
                                             onChange={(e) => this.setState({endTime: e.target.value})}
                                         />
                                     </InputWrapper>
                                 </InputWrapper>
                                 <SelectionListContainer
-                                    onPropChange={(id) => this.setState({roomId: id})}
-                                    items={roomList || []}
-                                    selectedItem={roomId}
-                                    event={this.state}
+                                    onRoomChange={(id) => this.onRoomClick(id)}
+                                    items={freeRooms || empty}
+                                    selectedItem={{roomId, startTime}}
                                 />
                             </EditColumn>
                         </Form>
@@ -220,7 +376,7 @@ class EditPage extends React.Component {
                             text={`${moment(date).format("DD MMMM YYYY")}, ${startTime}`}
                             isDialog
                             img={forbid}
-                            onSubmitClick={() => removeEvent(this.id)}
+                            onSubmitClick={() => removeEvent(this.eventId)}
                             onCancelClick={() => this.setState({isRemoved: false})}
                         />
                         : null
@@ -235,6 +391,16 @@ class EditPage extends React.Component {
                         />
                         : null
                 }
+                {
+                    isUpdated
+                        ? <DialogBox
+                            title="Встреча была изменена!"
+                            subtitle={title}
+                            text={`${moment(date).format("DD MMMM YYYY")}, ${startTime}`}
+                            img={success}
+                        />
+                        : null
+                }
             </Column>
         )
     }
@@ -243,16 +409,22 @@ class EditPage extends React.Component {
 const EditPageWithData = compose(
     createEvent,
     removeEvent,
-    getEventById,
+    updateEvent,
     getEventsByDate,
     getRoomList,
+    getEventById,
     getUserList
 )(EditPage);
 
-const mapStateToProps = (store) => ({
-    date: store.date
+const mapStateToProps = state => ({
+    date: state.date
+});
+
+const mapDispatchToProps = dispatch => ({
+    onDateChange: date => dispatch(setDate(date))
 });
 
 export const Edit = connect(
-    mapStateToProps
+    mapStateToProps,
+    mapDispatchToProps
 )(EditPageWithData);

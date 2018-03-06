@@ -76,7 +76,7 @@ export const getRoomList = graphql(
 const createEventQuery = gql`
     mutation createEvent($input: EventInput!, $usersIds: [ID]!, $roomId: ID!) {
         createEvent(input: $input, usersIds: $usersIds, roomId: $roomId) {
-            id, title, dateStart, dateEnd, room{id}, users{id, login, avatarUrl}
+            id, title, dateStart, dateEnd,  room{id, floor, title}, users{id, login, avatarUrl}
         }
     }
 `;
@@ -92,7 +92,7 @@ const removeEventQuery = gql`
 const updateEventQuery = gql`
     mutation updateEvent($id: ID!, $input: EventInput!, $usersIds: [ID]!, $roomId: ID!) {
         updateEvent(id: $id, input: $input, usersIds: $usersIds, roomId: $roomId) {
-            id, title, dateStart, dateEnd, room{id}, users{id, login, avatarUrl}
+            id, title, dateStart, dateEnd, room{id, floor, title}, users{id, login, avatarUrl}
         }
     }
 `;
@@ -150,30 +150,50 @@ export const removeEvent = graphql(
     }
 );
 
-// export const updateEvent =  graphql(
-//     updateEventQuery,
-//     {
-//         props: ({mutate}) => ({
-//             updateEvent: ({id, usersIds, roomId, input}) => mutate({
-//                 variables: {
-//                     id,
-//                     usersIds,
-//                     roomId,
-//                     input
-//                 }
-//             })
-//         }),
-//         options: {
-//             update: (proxy, {data: {updateEvent}}) => {
-//                 const date = moment(updateEvent.dateStart).set("hours", 12).startOf("hours").format();
-//                 const data = proxy.readQuery({
-//                     query: updateEventQuery,
-//                     variables: {date}
-//                 });
-// // если поменяем время???
-//                 data.eventsByDate.push(createEvent);
-//                 proxy.writeQuery({query: eventsByDateQuery, variables: {date}, data});
-//             }
-//         }
-//     }
-// );
+export const updateEvent = graphql(
+    updateEventQuery,
+    {
+        props: (props) => ({
+            updateEvent: ({id, usersIds, roomId, input, lastDate}) => props.mutate({
+                variables: {
+                    id,
+                    usersIds,
+                    roomId,
+                    input
+                },
+                update: (proxy, {data: {updateEvent}}) => {
+                    console.log(0, updateEvent);
+                    const {id, dateStart} = updateEvent;
+                    const date = moment(dateStart).set("hours", 12).startOf("hours").format();
+                    const data = proxy.readQuery({
+                        query: eventsByDateQuery,
+                        variables: {date}
+                    });
+                    const prevDateString = moment(lastDate).format("YYYY-MM-DD");
+                    const nextDateString = moment(dateStart).format("YYYY-MM-DD");
+                    let events = data.eventsByDate;
+                    let index = events.findIndex(item => item.id === id);
+
+                    if (prevDateString === nextDateString) {
+                        events[index] = {...updateEvent};
+                        return proxy.writeQuery({query: eventsByDateQuery, variables: {date}, data});
+                    }
+
+                    data.eventsByDate.push(updateEvent);
+                    proxy.writeQuery({query: eventsByDateQuery, variables: {date}, data});
+
+                    const prevDate = moment(prevDateString).set("hours", 12).startOf("hours").format();
+                    const prevData = proxy.readQuery({
+                        query: eventsByDateQuery,
+                        variables: {date: prevDate}
+                    });
+
+                    events = prevData.eventsByDate;
+                    index = events.findIndex(item => item.id === id);
+                    events.splice(index, 1);
+                    proxy.writeQuery({query: eventsByDateQuery, variables: {date: prevDate}, data: prevData});
+                }
+            })
+        })
+    }
+);

@@ -26,8 +26,6 @@
     "react-tooltip": "3.4.0",
     "redux": "3.7.2",
     "redux-actions": "2.2.1",
-    "redux-thunk": "2.2.0",
-    "redux-thunk-actions": "1.1.6",
     "styled-components": "2.4.0"
   },
   "devDependencies": {

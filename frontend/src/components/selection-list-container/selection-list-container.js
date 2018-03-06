@@ -24,33 +24,39 @@ export class SelectionListContainer extends React.Component {
         this.setState({
             selectedItem:
                 nextProps.selectedItem
-                    ? nextProps.items.find(item => item.id === nextProps.selectedItem)
+                    ? nextProps.items.find(item =>
+                        item.id === nextProps.selectedItem.roomId
+                        && nextProps.selectedItem.startTime === moment(item.time[0]).format("HH:mm")
+                    )
                     : null
         });
     }
 
     selectItem(item) {
-        this.props.onPropChange(item.id)
+        this.props.onRoomChange(item);
     }
 
     removeItem() {
-
-        this.props.onPropChange(null)
+        this.props.onRoomChange(null);
     }
 
     render() {
-        let label, listItems, item;
-        const {event} = this.props;
+        let label, listItems;
+        const {selectedItem} = this.state;
+        console.log(selectedItem, this.props.items);
 
-        if (this.state.selectedItem) {
-            item = this.state.selectedItem;
+        if (selectedItem) {
             label = "Ваша переговорка";
             listItems =
                 <SelectionListItem
-                    key={item.id}
+                    key={selectedItem.id}
                     type="primary"
-                    title={`${event.startTime} — ${event.endTime}`}
-                    subtitle={`${item.title} · ${item.floor}`}
+                    title={`
+                        ${moment(selectedItem.time[0]).format("HH:mm")}
+                        —
+                        ${moment(selectedItem.time[1]).format("HH:mm")}
+                    `}
+                    subtitle={`${selectedItem.title} · ${selectedItem.floor}`}
                     icon="close"
                     iconColor="#FFFFFF"
                     onIconClick={this.removeItem}
@@ -59,9 +65,13 @@ export class SelectionListContainer extends React.Component {
             label = "Рекомендованные переговорки";
             listItems = this.props.items.map(item =>
                 <SelectionListItem
-                    key={item.id}
+                    key={`${item.id}${item.time[0]}`}
                     type="default"
-                    title={`${event.startTime} — ${event.endTime}`}
+                    title={`
+                        ${moment(item.time[0]).format("HH:mm")}
+                        —
+                        ${moment(item.time[1]).format("HH:mm")}
+                    `}
                     subtitle={`${item.title} · ${item.floor}`}
                     onItemClick={() => this.selectItem(item)}
                 />
