@@ -1,1 +1,1 @@
-export { default } from "./room-list-item";
+export {RoomListItem} from "./room-list-item";

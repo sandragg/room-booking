@@ -1,1 +1,1 @@
-export {default} from "./time-ticker";
+export {TimeTicker} from "./time-ticker";

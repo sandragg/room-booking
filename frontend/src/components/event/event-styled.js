@@ -1,9 +1,7 @@
 import styled from "styled-components";
-import {Column, Row} from "../common-style";
-import {ONE_HOUR_WIDTH} from "../constants";
-import {RoomLineWrapperStyled} from "../room-line/room-line-styled";
+import {ONE_HOUR_WIDTH} from "../../constants";
 
-export const EventWrapperStyled = styled(Column)`
+export const EventWrapper = styled.div`
   position: absolute;
   height: 100%;
   width: ${props => (props.width || ONE_HOUR_WIDTH) + "%"};

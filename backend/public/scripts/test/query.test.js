@@ -1,4 +1,4 @@
-const { getOne, getList, getEventRoomId } = require("./actions");
+const {getOne, getList, getEventRoomId} = require("./actions");
 
 describe("Query", () => {
     describe("User", () => {

@@ -1,4 +1,4 @@
-const { mock, create, createEvent, update, remove, eventChanges } = require("./actions");
+const {mock, create, createEvent, updateEvent, update, remove, eventChanges} = require("./actions");
 
 describe("Mutation", () => {
     describe("Event", () => {
@@ -6,7 +6,7 @@ describe("Mutation", () => {
         it("should remove the first user from the first event", () => eventChanges("removeUserFromEvent", "user"));
         it("should add the first user to the first event", () => eventChanges("addUserToEvent", "user"));
         it("should change the first event room", () => eventChanges("changeEventRoom", "room"));
-        it("should update the first event", () => update("Event", mock.update.Event));
+        it("should update the first event", () => updateEvent(mock.update.Event));
         it("should remove the first event", () => remove("Event"));
     });
 

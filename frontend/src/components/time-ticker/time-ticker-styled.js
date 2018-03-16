@@ -1,7 +1,7 @@
 import styled, {css} from "styled-components";
-import {Column} from "../common-style";
+import {Column} from "../../common-style";
 
-export const TimeTickerContentStyled = styled(Column)`
+export const TimeTickerContent = styled(Column)`
   background: #007DFF;
   height: 20px;
   width: 50px;
@@ -11,16 +11,16 @@ export const TimeTickerContentStyled = styled(Column)`
   position: relative;
 `;
 
-export const TimerTickerDividerStyled = styled(Column)`
+export const TimerTickerDivider = styled(Column)`
   width: 1px;
-  height: ${props => props.height ? (props.height + "px") : "calc(100vh + 35px)"}; // what?!
+  height: ${props => props.height ? (props.height + "px") : "calc(100vh + 12px - 72px - 46px)"};
   background: #007DFF;
   position: absolute;
   left: 50%;
   top: 20px;
 `;
 
-export const TimerTickerWrapperStyled = styled(Column)`
+export const TimerTickerWrapper = styled(Column)`
   position: absolute;
   top: 50%;
   transform: translateY(-50%);

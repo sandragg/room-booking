@@ -1,4 +1,4 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
     entry: {
@@ -33,13 +33,6 @@ module.exports = {
                         ]
                     }
                 }
-            },
-            {
-                test: /\.js$/,
-                include: /node_modules/,
-                use: [
-                    "babel-loader"
-                ]
             },
             {
                 test: /\.css$/,

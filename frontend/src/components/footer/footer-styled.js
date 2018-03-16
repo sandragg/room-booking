@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import {Row} from "../common-style";
+import {Row} from "../../common-style";
 
 export const FooterWrapper = styled(Row)`
   justify-content: center;

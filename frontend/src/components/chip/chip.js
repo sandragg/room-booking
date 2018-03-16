@@ -4,6 +4,7 @@ import {Avatar} from "../avatar";
 import {Icon} from "../icon";
 
 export class Chip extends React.Component {
+
     constructor(props) {
         super(props);
 
@@ -11,8 +12,8 @@ export class Chip extends React.Component {
             hover: false
         };
 
-        this.hover = ::this.hover;
-        this.unHover = ::this.unHover;
+        this.hover = this.hover.bind(this);
+        this.unHover = this.unHover.bind(this);
     }
 
     hover() {
@@ -24,16 +25,19 @@ export class Chip extends React.Component {
     }
 
     render() {
+        const {itemId, avatarUrl, children, onIconClick} = this.props;
+
         return (
             <ChipWrapper
                 onMouseOver={this.hover}
                 onMouseOut={this.unHover}
             >
-                <Avatar url={this.props.avatarUrl}/>
-                <ChipTitle>{this.props.children}</ChipTitle>
+                <Avatar url={avatarUrl}/>
+                <ChipTitle>{children}</ChipTitle>
                 <Icon
                     hover={this.state.hover}
-                    onClick={this.props.onIconClick}
+                    data-item-id={itemId}
+                    onClick={onIconClick}
                     type="close"
                 />
             </ChipWrapper>

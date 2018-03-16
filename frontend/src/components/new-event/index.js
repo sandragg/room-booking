@@ -1,1 +1,1 @@
-export {default} from "./new-event";
+export {NewEvent} from "./new-event";

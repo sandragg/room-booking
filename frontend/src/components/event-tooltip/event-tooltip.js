@@ -1,51 +1,54 @@
 import React from "react";
 import {Link} from "react-router-dom";
+import moment from "moment";
+
 import {
-    EventTooltipContentStyled,
-    EventTooltipStyled,
-    EventContentWrapperStyled,
-    EventContentStyled,
-    EventParticipantsStyled,
-    EventParticipantsWrapperStyled,
-    EventTitleStyled,
-    EventParticipantsOtherStyled,
-    EventMainParticipantStyled,
+    CALENDAR_DATE_FORMAT,
+    TIME_FORMAT
+} from "../../constants";
+import {
+    EventTooltipWrapper,
+    EventContentWrapper,
+    EventContent,
+    EventTitle,
+    EventSubtitle,
+    EventParticipantsWrapper,
+    EventParticipants,
+    EventMainParticipant,
+    EventParticipantsOther,
     EventIcon
 } from "./event-tooltip-styled";
-import moment from "moment";
 import {Icon} from "../icon";
 
-export default ({event, id}) => {
+export const EventTooltip = ({event, id}) => {
     const {title, dateStart, dateEnd, room, users} = event;
-    const date = moment(dateStart, moment.ISO).format("DD MMM");
-    const timeStart = moment(dateStart).format("LT");
-    const timeEnd = moment(dateEnd).format("LT");
+    const date = moment(dateStart).format(CALENDAR_DATE_FORMAT);
+    const timeStart = moment(dateStart).format(TIME_FORMAT);
+    const timeEnd = moment(dateEnd).format(TIME_FORMAT);
     const content = `${date}, ${timeStart} — ${timeEnd} · ${room.title}`;
 
     return (
-        <EventTooltipStyled id={id}>
-            <EventTooltipContentStyled>
-                <EventContentWrapperStyled>
-                    <EventTitleStyled>{title}</EventTitleStyled>
+        <EventTooltipWrapper id={id}>
+            <EventContentWrapper>
+                <EventContent>
+                    <EventTitle>{title}</EventTitle>
                     <Link to={"edit/" + event.id}>
-                        <EventIcon>
-                            <Icon background type="edit"/>
-                        </EventIcon>
+                        <EventIcon><Icon background type="edit"/></EventIcon>
                     </Link>
-                    <EventContentStyled>{content}</EventContentStyled>
-                    <EventParticipantsWrapperStyled>
-                        <EventParticipantsStyled>
-                            <EventMainParticipantStyled>
+                    <EventSubtitle>{content}</EventSubtitle>
+                    <EventParticipantsWrapper>
+                        <EventParticipants>
+                            <EventMainParticipant>
                                 {users[0] ? users[0].login : null}
-                            </EventMainParticipantStyled>
+                            </EventMainParticipant>
                             &nbsp;
-                            <EventParticipantsOtherStyled>
+                            <EventParticipantsOther>
                                 {(users[0] ? `и ${users.length - 1}` : 0) + " участников"}
-                            </EventParticipantsOtherStyled>
-                        </EventParticipantsStyled>
-                    </EventParticipantsWrapperStyled>
-                </EventContentWrapperStyled>
-            </EventTooltipContentStyled>
-        </EventTooltipStyled>
+                            </EventParticipantsOther>
+                        </EventParticipants>
+                    </EventParticipantsWrapper>
+                </EventContent>
+            </EventContentWrapper>
+        </EventTooltipWrapper>
     );
 };

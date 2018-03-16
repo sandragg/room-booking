@@ -1,24 +1,22 @@
 import React from "react";
 import {
-    TimeTickerContentStyled,
-    TimerTickerDividerStyled,
-    TimerTickerWrapperStyled
+    TimeTickerContent,
+    TimerTickerDivider,
+    TimerTickerWrapper
 } from "./time-ticker-styled";
 
-export default ({time, offset}) => {
+export const TimeTicker = ({time, offset}) => {
     const hour = parseInt(time.split(":")[0]);
     const isTimeInRange = hour >= 8 && hour < 23;
 
     const ticker = (
-        <TimerTickerWrapperStyled offset={offset}>
-            <TimeTickerContentStyled>
+        <TimerTickerWrapper offset={offset}>
+            <TimeTickerContent>
                 <span>{time}</span>
-                <TimerTickerDividerStyled/>
-            </TimeTickerContentStyled>
-        </TimerTickerWrapperStyled>
+                <TimerTickerDivider/>
+            </TimeTickerContent>
+        </TimerTickerWrapper>
     );
 
-    return (
-        isTimeInRange ? ticker : null
-    );
-}
+    return isTimeInRange ? ticker : null;
+};

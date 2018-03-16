@@ -1,1 +1,1 @@
-export {default} from "./event-tooltip";
+export {EventTooltip} from "./event-tooltip";

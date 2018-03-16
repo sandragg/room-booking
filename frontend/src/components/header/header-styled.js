@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import {Row} from "../common-style";
+import {Row} from "../../common-style";
 
 export const HeaderWrapper = styled(Row)`
   justify-content: flex-end;
@@ -8,7 +8,7 @@ export const HeaderWrapper = styled(Row)`
   padding: 0 16px;
   border-bottom: 1px solid #E9ECEF;
   background: url(${props => props.logoUrl}) 24.5px 25px no-repeat;
-  background-size: 174px 24.5px;
+  background-size: 120px 24.5px;
 `;
 
 export const HeaderItemsWrapper = styled.div`

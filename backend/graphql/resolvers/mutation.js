@@ -2,35 +2,35 @@ const {models} = require("../../models");
 
 module.exports = {
     // User
-    createUser(root, {input}, context) {
+    createUser(root, {input}) {
         return models.User.create(input);
     },
 
-    updateUser(root, {id, input}, context) {
+    updateUser(root, {id, input}) {
         return models.User.findById(id)
             .then(user => user.update(input));
     },
 
-    removeUser(root, {id}, context) {
+    removeUser(root, {id}) {
         return models.User.findById(id)
             .then(user => user.destroy());
     },
     // Room
-    createRoom(root, {input}, context) {
+    createRoom(root, {input}) {
         return models.Room.create(input);
     },
 
-    updateRoom(root, {id, input}, context) {
+    updateRoom(root, {id, input}) {
         return models.Room.findById(id)
             .then(room => room.update(input));
     },
 
-    removeRoom(root, {id}, context) {
+    removeRoom(root, {id}) {
         return models.Room.findById(id)
             .then(room => room.destroy());
     },
     // Event
-    createEvent(root, {input, usersIds, roomId}, context) {
+    createEvent(root, {input, usersIds, roomId}) {
         let event;
 
         return models.Event.create(input)
@@ -43,29 +43,9 @@ module.exports = {
                 ]);
             })
             .then(() => event);
-
-        // return models.Event.create(input)
-        //     .then(event => {
-        //         event.setRoom(roomId);
-        //         event.setUsers(usersIds);
-        //         return event;
-        //     });
-
-        // let id;
-        //
-        // return models.Event.create(input)
-        //     .then(event => {
-        //         id = event.dataValues.id;
-        //
-        //         return Promise.all([
-        //             event.setRoom(roomId),
-        //             event.setUsers(usersIds)
-        //         ]);
-        //     })
-        //     .then(() => models.Event.findById(id))
     },
 
-    updateEvent(root, {id, input, roomId, usersIds}, context) {
+    updateEvent(root, {id, input, roomId, usersIds}) {
         let event;
 
         return models.Event.findById(id)
@@ -82,24 +62,19 @@ module.exports = {
             .catch(err => console.error(err))
     },
 
-    removeUserFromEvent(root, {id, userId}, context) {
-        // let event;
-        //
-        // return models.Event.findById(id)
-        //     .then(res => {
-        //         event = res;
-        //
-        //         return event.removeUser(userId);
-        //     })
-        //     .then(() => event);
+    removeUserFromEvent(root, {id, userId}) {
+        let event;
+
         return models.Event.findById(id)
-            .then(event => {
-                event.removeUser(userId);
-                return event;
-            });
+            .then(res => {
+                event = res;
+
+                return event.removeUser(userId);
+            })
+            .then(() => event);
     },
 
-    addUserToEvent(root, {id, userId}, context) {
+    addUserToEvent(root, {id, userId}) {
         let event;
 
         return models.Event.findById(id)
@@ -111,12 +86,12 @@ module.exports = {
             .then(() => event);
     },
 
-    changeEventRoom(root, {id, roomId}, context) {
+    changeEventRoom(root, {id, roomId}) {
         return models.Event.findById(id)
             .then(event => event.setRoom(roomId));
     },
 
-    removeEvent(root, {id}, context) {
+    removeEvent(root, {id}) {
         return models.Event.findById(id)
             .then(event => event.destroy());
     }

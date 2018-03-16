@@ -1,5 +1,5 @@
 import styled  from "styled-components";
-import {Column} from "../common-style";
+import {Column} from "../../common-style";
 
 export const IconWrapper = styled(Column)`
   width: 24px;

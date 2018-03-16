@@ -1,9 +1,10 @@
-import {graphql} from 'react-apollo';
+import {graphql} from "react-apollo";
 import gql from "graphql-tag";
 import moment from "moment";
+import {INPUT_DATE_FORMAT} from "../constants";
 
-/*
-    Queries
+/**
+ * Queries
  */
 const eventsByDateQuery = gql`
     query ($date: Date!) {
@@ -41,7 +42,7 @@ export const getEventsByDate = graphql(
     eventsByDateQuery,
     {
         options: (props) => ({
-            variables: {date: moment(props.date, "DD MMMM YYYY").set("hours", 12).startOf("hours").format()}
+            variables: {date: moment(props.date).set("hours", 12).startOf("hours").format()}
         }),
         props: ({data: {eventsByDate}}) => ({eventList: eventsByDate})
     }
@@ -70,8 +71,8 @@ export const getRoomList = graphql(
 );
 
 
-/*
-    Mutations
+/**
+ * Mutations
  */
 const createEventQuery = gql`
     mutation createEvent($input: EventInput!, $usersIds: [ID]!, $roomId: ID!) {
@@ -162,15 +163,14 @@ export const updateEvent = graphql(
                     input
                 },
                 update: (proxy, {data: {updateEvent}}) => {
-                    console.log(0, updateEvent);
                     const {id, dateStart} = updateEvent;
                     const date = moment(dateStart).set("hours", 12).startOf("hours").format();
                     const data = proxy.readQuery({
                         query: eventsByDateQuery,
                         variables: {date}
                     });
-                    const prevDateString = moment(lastDate).format("YYYY-MM-DD");
-                    const nextDateString = moment(dateStart).format("YYYY-MM-DD");
+                    const prevDateString = moment(lastDate).format(INPUT_DATE_FORMAT);
+                    const nextDateString = moment(dateStart).format(INPUT_DATE_FORMAT);
                     let events = data.eventsByDate;
                     let index = events.findIndex(item => item.id === id);
 

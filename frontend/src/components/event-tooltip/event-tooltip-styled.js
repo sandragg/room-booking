@@ -1,11 +1,11 @@
 import styled from "styled-components";
-import {Column, Row} from "../common-style";
+import {Column, Row} from "../../common-style";
 import Tooltip from "react-tooltip";
 
 const tooltipWidth = 338;
 const tooltipHeight = 115;
 
-export const EventTooltipStyled = styled(Tooltip)`
+export const EventTooltipWrapper = styled(Tooltip)`
   pointer-events: auto !important;
   height: ${tooltipHeight}px;
   width: ${tooltipWidth}px;
@@ -21,19 +21,18 @@ export const EventTooltipStyled = styled(Tooltip)`
   }
 `;
 
-export const EventTooltipContentStyled = styled(Column)`
+export const EventContentWrapper = styled(Column)`
   width: 100%;
   height: 115px;
   position: relative;
 `;
 
-
-export const EventContentWrapperStyled = styled(Column)`
+export const EventContent = styled(Column)`
   flex-basis: 100%;
   padding: 16px;
 `;
 
-export const EventTitleStyled = styled(Column)`
+export const EventTitle = styled(Column)`
   font-family: HelveticaNeue-Bold;
   font-size: 15px;
   color: #000000;
@@ -48,7 +47,7 @@ export const EventIcon = styled.div`
   right: 8px;
 `;
 
-export const EventContentStyled = styled(Column)`
+export const EventSubtitle = styled(Column)`
   font-family: HelveticaNeue;
   font-size: 13px;
   color: #000000;
@@ -56,21 +55,19 @@ export const EventContentStyled = styled(Column)`
   line-height: 17px;
 `;
 
-export const EventParticipantsWrapperStyled = styled(Row)`
+export const EventParticipantsWrapper = styled(Row)`
   margin-top: 16px;
 `;
 
-export const EventParticipantsStyled = styled(Row)`
+export const EventParticipants = styled(Row)`
   font-family: Helvetica;
   font-size: 13px;
   letter-spacing: 0;
   line-height: 17px;
 `;
 
-export const EventMainParticipantStyled = styled.span`
+export const EventMainParticipant = styled.span``;
 
-`;
-
-export const EventParticipantsOtherStyled = styled.span`
+export const EventParticipantsOther = styled.span`
   color: gray;
 `;

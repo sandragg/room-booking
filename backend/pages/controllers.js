@@ -1,5 +1,4 @@
-module.exports.index = (req, res) => {
-  res.send(`
+module.exports.index = (req, res) => res.send(`
     <html>
       <head>
         <title>Shri 2018</title>
@@ -7,5 +6,4 @@ module.exports.index = (req, res) => {
       </head>
       <h1>Hello</h1>
     </html>
-    `);
-};
+`);

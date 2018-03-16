@@ -1,17 +1,15 @@
 import React from "react";
 import {
-    InputContainerWrapper,
-    InputLabel,
     InputWrapper,
-    InputIcon
+    InputLabel,
+    InputContainerWrapper
 } from "./input-styled";
-import {Icon} from "../icon";
 
-export const Input = ({type, label, placeholder, value, onChange}) => (
+export const Input = ({type, label, placeholder, value, onChange, flag}) => (
     <InputContainerWrapper>
-        {/*{type === "date"*/}
-        {/*&& <InputIcon> <Icon type="date"/> </InputIcon>}*/}
         <InputLabel>{label}</InputLabel>
-        <InputWrapper type={type} placeholder={placeholder} value={value} onChange={onChange}/>
+        <InputWrapper type={type} placeholder={placeholder} value={value}
+               onChange={onChange} data-flag={flag}
+        />
     </InputContainerWrapper>
 );

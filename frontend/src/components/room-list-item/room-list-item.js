@@ -1,19 +1,20 @@
 import React from "react";
 import {
-    RoomListItemStyled,
-    RoomListItemTitleStyled,
-    RoomListItemSubtitleStyled,
-    RoomListItemWrapperStyled,
+    RoomListItemContent,
+    RoomListItemTitle,
+    RoomListItemSubtitle,
+    RoomListItemWrapper,
 } from "./room-list-item-styled";
-import RoomLineContainer from "../room-line";
+import {RoomLine} from "../room-line";
 
-export default ({disabled, title, subtitle, events, freeEvents, roomId}) => (
-    <RoomListItemWrapperStyled>
-        <RoomListItemStyled disabled={disabled}>
-            <RoomListItemTitleStyled disabled={disabled}>{title}</RoomListItemTitleStyled>
-            <RoomListItemSubtitleStyled disabled={disabled}>{subtitle}</RoomListItemSubtitleStyled>
-        </RoomListItemStyled>
-        <RoomLineContainer disabled={disabled} events={events} freeEvents={freeEvents} roomId={roomId}/>
-    </RoomListItemWrapperStyled>
-
+export const RoomListItem = ({disabled, title, subtitle, events, freeEvents, roomId, newEvent, activeRoomLine}) => (
+    <RoomListItemWrapper>
+        <RoomListItemContent disabled={disabled}>
+            <RoomListItemTitle disabled={disabled}>{title}</RoomListItemTitle>
+            <RoomListItemSubtitle>{subtitle}</RoomListItemSubtitle>
+        </RoomListItemContent>
+        <RoomLine events={events} freeEvents={freeEvents} roomId={roomId}
+                  newEvent={newEvent} activeRoomLine={activeRoomLine}
+        />
+    </RoomListItemWrapper>
 );

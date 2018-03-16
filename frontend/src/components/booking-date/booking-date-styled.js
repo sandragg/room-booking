@@ -1,10 +1,10 @@
 import React from "react";
 import styled from "styled-components";
+import {Row} from "../../common-style";
 
-export const BookingDateWrapperStyled = styled.div`
+export const BookingDateWrapper = styled(Row)`
   height: 46px;
   width: 245px;
-  display: flex;
   align-items: center;
   justify-content: center;
 `;

@@ -1,1 +1,1 @@
-export {default} from "./booking-date";
+export {BookingDate} from "./booking-date";

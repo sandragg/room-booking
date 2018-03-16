@@ -1,1 +1,1 @@
-export {default} from "./room-line";
+export {RoomLine} from "./room-line";

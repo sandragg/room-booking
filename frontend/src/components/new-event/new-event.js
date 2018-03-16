@@ -1,8 +1,11 @@
 import React from "react";
 import {NewEventWrapper} from "./new-event-styled";
 
-export default ({offset, id}) => {
-    return (
-        <NewEventWrapper id={id} offset={offset}>+</NewEventWrapper>
-    );
-}
+export const NewEvent = ({offset, id, roomId}) => (
+    <NewEventWrapper
+        id={id} offset={offset}
+        data-room-line-id={roomId}
+    >
+        +
+    </NewEventWrapper>
+);

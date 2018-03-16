@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import {Column, Row} from "../common-style";
+import {Column, Row} from "../../common-style";
 
-export const OuterWrapper = styled.div`
+export const DialogBoxBackground = styled.div`
   position: absolute;
   top: 0;
   left: 0;

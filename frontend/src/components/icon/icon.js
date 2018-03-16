@@ -3,6 +3,7 @@ import {IconWrapper} from "./icon-styled";
 import {iconHash} from "./icon-hash";
 
 export class Icon extends React.Component {
+
     constructor(props) {
         super(props);
 
@@ -10,8 +11,8 @@ export class Icon extends React.Component {
             hover: false
         };
 
-        this.hover = ::this.hover;
-        this.unHover = ::this.unHover;
+        this.hover = this.hover.bind(this);
+        this.unHover = this.unHover.bind(this);
     }
 
     hover() {
@@ -24,6 +25,7 @@ export class Icon extends React.Component {
 
     render() {
         const Icon = iconHash[this.props.type];
+        const {hover, fill} = this.props;
 
         return (
             <IconWrapper
@@ -32,8 +34,8 @@ export class Icon extends React.Component {
                 onMouseOut={this.unHover}
             >
                 <Icon
-                    fill={this.props.fill}
-                    hover={this.props.hover || this.state.hover}
+                    fill={fill}
+                    hover={hover || this.state.hover}
                 />
             </IconWrapper>
         );

@@ -1,6 +1,6 @@
-import styled, {css} from "styled-components";
-import {Row} from "../common-style";
-import {ONE_HOUR_WIDTH} from "../constants";
+import styled from "styled-components";
+import {Row} from "../../common-style";
+import {ONE_HOUR_WIDTH} from "../../constants";
 
 export const NewEventWrapper = styled(Row).attrs({
     style: ({offset}) =>  ({left: `calc(${offset}px - ${ONE_HOUR_WIDTH/4}%)`})

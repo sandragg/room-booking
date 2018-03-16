@@ -1,26 +1,28 @@
 import React from "react";
 import {
-    TimeLineWrapperStyled,
-    TimeLineHourStyled,
-    TimeLineContentStyled
+    TimeLineWrapper,
+    TimeLineHour,
+    TimeLineContent,
+    HourDivider
 } from "./time-line-styled";
-import TimeTicker from "../time-ticker";
-import HourDivider from "../hour-divider";
+import {TimeTicker} from "../time-ticker";
 
-export default ({hours, tickerTime, tickerOffset}) => {
+export const TimeLine = ({hours, tickerTime, tickerOffset}) => {
     const currHour = tickerTime.split(":")[0];
 
     return (
-        <TimeLineWrapperStyled>
-            <TimeLineContentStyled>
+        <TimeLineWrapper>
+            <TimeLineContent>
                 <TimeTicker time={tickerTime} offset={tickerOffset}/>
-                {hours.map(hour =>
-                    <TimeLineHourStyled key={hour + "hour"} disabled={hour <= currHour} >
-                        {hour}
-                        <HourDivider/>
-                    </TimeLineHourStyled>
-                )}
-            </TimeLineContentStyled>
-        </TimeLineWrapperStyled>
+                {
+                    hours.map(hour =>
+                        <TimeLineHour key={hour + "hour"} disabled={hour <= currHour}>
+                            {hour}
+                            <HourDivider/>
+                        </TimeLineHour>
+                    )
+                }
+            </TimeLineContent>
+        </TimeLineWrapper>
     );
-}
+};

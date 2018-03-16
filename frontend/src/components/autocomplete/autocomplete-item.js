@@ -8,21 +8,19 @@ import {
 } from "./autocomplete-styled";
 import {Avatar} from "../avatar";
 
-export const AutocompleteItem = ({avatar, title, subtitle}) => {
-    return (
-        <AutocompleteItemWrapper>
-            <AutocompleteItemAvatarWrapper>
-                <Avatar url={avatar}/>
-            </AutocompleteItemAvatarWrapper>
-            <AutocompleteItemTitleWrapper>
-                <AutocompleteItemTitle>
-                    {title}
-                </AutocompleteItemTitle>
-                {" · "}
-                <AutocompleteItemSubtitle>
-                    {subtitle}
-                </AutocompleteItemSubtitle>
-            </AutocompleteItemTitleWrapper>
-        </AutocompleteItemWrapper>
-    );
-};
+export const AutocompleteItem = ({avatar, title, subtitle}) => (
+    <AutocompleteItemWrapper>
+        <AutocompleteItemAvatarWrapper>
+            <Avatar url={avatar}/>
+        </AutocompleteItemAvatarWrapper>
+        <AutocompleteItemTitleWrapper>
+            <AutocompleteItemTitle>
+                {title}
+            </AutocompleteItemTitle>
+            {" · "}
+            <AutocompleteItemSubtitle>
+                {subtitle}
+            </AutocompleteItemSubtitle>
+        </AutocompleteItemTitleWrapper>
+    </AutocompleteItemWrapper>
+);

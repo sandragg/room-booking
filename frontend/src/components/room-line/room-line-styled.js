@@ -1,7 +1,7 @@
-import styled, {css} from "styled-components";
-import {Row} from "../common-style";
+import styled from "styled-components";
+import {Row} from "../../common-style";
 
-export const RoomLineWrapperStyled = styled(Row)`
+export const RoomLineWrapper = styled(Row)`
   flex-grow: 1;
   height: 28px;
   background: white;
@@ -14,7 +14,7 @@ export const RoomLineWrapperStyled = styled(Row)`
  */
 const hoursMarginHalf = (13 - 1) / 2;
 
-export const RoomLineContentStyled = styled(Row)`
+export const RoomLineContent = styled(Row)`
   position: relative;
   margin: 0 ${20 + hoursMarginHalf}px;
   flex-grow: 1;

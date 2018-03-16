@@ -1,27 +1,32 @@
 import React from "react";
-import {BookingDateText, BookingDateWrapperStyled} from "./booking-date-styled";
-import BookingDateCalendar from "../booking-date-calendar";
-import {Icon} from "../icon/icon";
 import moment from "moment";
 
-export default ({toggleCalendar, changeDate, day, isCalendarOpened}) => {
-    const prev = moment(day,"DD MMMM YYYY").subtract(12, "hours"),
-        next = moment(day,"DD MMMM YYYY").add(36, "hours");
+import {BookingDateText, BookingDateWrapper} from "./booking-date-styled";
+import {BookingDateCalendar} from "../booking-date-calendar";
+import {Icon} from "../icon/icon";
+import {CALENDAR_DATE_FORMAT} from "../../constants";
 
+export const BookingDate = ({toggleCalendar, changeDate, date, isCalendarOpened}) => {
+    const prevDay = moment(date).subtract(1, "day").set("hours", 12).startOf("hours");
+    const nextDay = moment(date).add(1, "day").set("hours", 12).startOf("hours");
+    const currDay = moment(date).format(CALENDAR_DATE_FORMAT);
+
+    //TODO как поменять changeDate + проверить компонент ниже
     return (
-        <BookingDateWrapperStyled>
-            <Icon background type="arrowLeft" onClick={() => changeDate(prev)}/>
-            <BookingDateText onClick={toggleCalendar}>{day}</BookingDateText>
-            <Icon background type="arrowRight" onClick={() => changeDate(next)}/>
+        <BookingDateWrapper>
+            <Icon background type="arrowLeft" onClick={() => changeDate(prevDay)}/>
+            <BookingDateText onClick={toggleCalendar}>{currDay}</BookingDateText>
+            <Icon background type="arrowRight" onClick={() => changeDate(nextDay)}/>
             {
                 isCalendarOpened
                     ? <BookingDateCalendar
-                        date={day}
+                        date={date}
                         changeDate={changeDate}
                         toggleCalendar={toggleCalendar}
                     />
                     : null
             }
-        </BookingDateWrapperStyled>
+        </BookingDateWrapper>
     );
-}
+};
+

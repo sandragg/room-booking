@@ -1,5 +1,5 @@
 import styled, {css} from "styled-components";
-import {Column} from "../common-style";
+import {Column} from "../../common-style";
 
 export const InputContainerWrapper = styled(Column)`
   margin: 12px 0;
@@ -16,9 +16,7 @@ export const InputLabel = styled.div`
   padding-bottom: 4px;
 `;
 
-export const InputWrapper = styled.input.attrs({
-    // type: "date"
-})`
+export const InputWrapper = styled.input`
   type: ${props => props.type | "text"}
   outline: none;
   width: calc(100% - 24px);
@@ -32,8 +30,6 @@ export const InputWrapper = styled.input.attrs({
   font-size: 15px;
   color: #000000;
   letter-spacing: 0.55px;
-  
-  
   
   &:focus {
     border: 2px solid #007DFF;
@@ -51,10 +47,6 @@ export const InputWrapper = styled.input.attrs({
     ::-webkit-calendar-picker-indicator {
       color: #AFB4B8;
       opacity: 1;
-      //display: block;
-      //background:black;
-      //width: 20px;
-      //height: 20px;
       border-width: thin;
     }
     ::-webkit-calendar-picker-indicator:hover {
@@ -62,10 +54,4 @@ export const InputWrapper = styled.input.attrs({
       background: white;
     }
   `};
-`;
-
-export const InputIcon = styled.div`
-  position: absolute;
-  right: 12px;
-  bottom: 7px;
 `;

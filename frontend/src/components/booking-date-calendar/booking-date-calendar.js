@@ -1,14 +1,13 @@
 import React from "react";
-import Modal from "../modal";
-import {
-    BookingDateCalendarWrapper
-} from "./booking-date-calendar-styled";
-import 'react-dates/initialize';
-import 'react-dates/lib/css/_datepicker.css';
-import { DayPickerSingleDateController } from 'react-dates';
 import moment from "moment";
 
-export default ({changeDate, toggleCalendar, date}) => {
+import "react-dates/initialize";
+import "react-dates/lib/css/_datepicker.css";
+import {DayPickerSingleDateController} from "react-dates";
+import {BookingDateCalendarWrapper} from "./booking-date-calendar-styled";
+import {Modal} from "../modal";
+
+export const BookingDateCalendar = ({changeDate, toggleCalendar, date}) => {
     const onDateChange = (date) => {
         changeDate(date);
         toggleCalendar();
@@ -19,12 +18,11 @@ export default ({changeDate, toggleCalendar, date}) => {
             <BookingDateCalendarWrapper>
                 <DayPickerSingleDateController
                     numberOfMonths={1}
-                    date={moment(date,"DD MMMM YYYY")}
+                    date={moment(date)}
                     onDateChange={onDateChange}
                     focused={true}
                 />
             </BookingDateCalendarWrapper>
         </Modal>
     );
-}
-
+};

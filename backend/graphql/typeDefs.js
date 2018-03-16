@@ -11,11 +11,7 @@ module.exports = `
     input UserInput {
         login: String!
         homeFloor: Int
-    }
-    
-    type UserRoom {
-        id: ID!
-        title: String!
+        avatarUrl: String!
     }
     
     type Room {
@@ -72,8 +68,6 @@ module.exports = `
       changeEventRoom(id: ID!, roomId: ID!): Event
       removeEvent(id: ID!): Event
     }
-    
-    union SearchResult = User | Event | Room
     
     schema {
       query: Query

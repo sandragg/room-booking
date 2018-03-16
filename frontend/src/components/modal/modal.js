@@ -3,7 +3,8 @@ import ReactDOM from "react-dom";
 
 let modalRoot;
 
-export default class Modal extends React.Component {
+export class Modal extends React.Component {
+
     constructor(props) {
         super(props);
 

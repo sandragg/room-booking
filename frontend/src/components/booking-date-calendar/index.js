@@ -1,1 +1,1 @@
-export {default} from "./booking-date-calendar";
+export {BookingDateCalendar} from "./booking-date-calendar";

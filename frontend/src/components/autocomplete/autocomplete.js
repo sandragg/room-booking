@@ -1,5 +1,5 @@
 import React from "react";
-import ReactAutocomplete from 'react-autocomplete';
+import ReactAutocomplete from "react-autocomplete";
 import {AutocompleteItem} from "./autocomplete-item";
 import {AutocompleteIcon} from "./autocomplete-icon";
 import {
@@ -10,6 +10,7 @@ import {
 } from "./autocomplete-styled";
 
 export class Autocomplete extends React.Component {
+
     constructor(props) {
         super(props);
 
@@ -22,13 +23,13 @@ export class Autocomplete extends React.Component {
         this.subtitleKey = props.subtitleKey;
         this.avatarKey = props.avatarKey;
 
-        this.onChange = ::this.onChange;
-        this.onSelect = ::this.onSelect;
-        this.defaultRenderItem = ::this.defaultRenderItem;
-        this.defaultRenderInput = ::this.defaultRenderInput;
-        this.defaultGetItemValue = ::this.defaultGetItemValue;
-        this.defaultShouldItemRender = ::this.defaultShouldItemRender;
-        this.defaultOnMenuVisibilityChange = ::this.defaultOnMenuVisibilityChange;
+        this.onChange = this.onChange.bind(this);
+        this.onSelect = this.onSelect.bind(this);
+        this.defaultRenderItem = this.defaultRenderItem.bind(this);
+        this.defaultRenderInput = this.defaultRenderInput.bind(this);
+        this.defaultGetItemValue = this.defaultGetItemValue.bind(this);
+        this.defaultShouldItemRender = this.defaultShouldItemRender.bind(this);
+        this.defaultOnMenuVisibilityChange = this.defaultOnMenuVisibilityChange.bind(this);
 
         this.shouldItemRender = props.shouldItemRender || this.defaultShouldItemRender;
         this.getItemValue = props.getItemValue || this.defaultGetItemValue;
@@ -103,19 +104,22 @@ export class Autocomplete extends React.Component {
     }
 
     render() {
+        const {icon, value} = this.state;
+        const {label} = this.props;
+
         return (
             <AutocompleteWrapper>
                 <AutocompleteIcon
-                    icon={this.state.icon}
+                    icon={icon}
                 />
                 <AutocompleteLabel>
-                    {this.props.label}
+                    {label}
                 </AutocompleteLabel>
                 <ReactAutocomplete
                     shouldItemRender={this.shouldItemRender}
                     onChange={this.onChange}
                     onSelect={this.onSelect}
-                    value={this.state.value}
+                    value={value}
                     renderItem={this.defaultRenderItem}
                     renderInput={this.defaultRenderInput}
                     renderMenu={this.defaultRenderMenu}
