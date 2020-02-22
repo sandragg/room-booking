@@ -1,7 +1,7 @@
 Room Booking
 ============
 
-![Gif](https://media.giphy.com/media/6qq0BdfXVLCRCniwiD/giphy.gif)
+![Gif](https://media.giphy.com/media/IdmEhkywGbgco3z64p/giphy.gif)
 ## Описание
 Приложение для бронирования комнат для совещаний, конференций, переговоров, состоящее из клиентской и
 серверной частей.
